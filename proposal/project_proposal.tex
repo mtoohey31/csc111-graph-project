@@ -2,9 +2,16 @@
 \usepackage{amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=0.75in]{geometry}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
 
-\title{CSC111 Project Proposal: TODO FILL IN YOUR PROJECT TITLE HERE}
-\author{TODO: FILL IN ALL GROUP MEMBER NAMES HERE}
+\title{CSC111 Project Proposal: Comparing and Mapping Wikipedia's Articles}
+\author{Gabe Guralnick, Matthew Toohey, Nathan Hansen, Azka Azmi}
 \date{Tuesday, March 16, 2021}
 
 \begin{document}
@@ -12,19 +19,55 @@
 
 \section*{Problem Description and Research Question}
 
-TODO
+%idea: refuting/supporting stigma against Wikipedia - publicly edited so less accountability for sources, possible misinformation?
+% One problem, however, with Wikipedia's free and open model is just that: Anyone can change a Wikipedia article. Of course, there are good editors that revise changes daily to make sure malicious edits never last long, but is relying on volunteers to preserve the integrity of site content a viable strategy? This is something of particular concern in a society where fake news has become the norm, political battles are won and lost on the front lines of Facebook, and shock value is seen as a marketing strategy. Among all this chaos, there may still be hope to be found in an often-forgotten hero: The scholarly source.
+% The mark of an important Wikipedia article is being frequently referenced by other articles. filled with links to articles, books and papers credited by the article's various authors. But what makes a source ``good''?
+
+
+Wikipedia is an online encyclopedia used by millions of people to learn just about anything. From quick look-ups to in-depth research, Wikipedia is an excellent tool for finding information. 
+
+Wikipedia sorts its articles into various topics and categories. These categories range from sweepingly broad to very specific. Take, for example, the page about William Clark (who you may know from the Lewis and Clark expedition). His article falls under categories \textit{United States Army Officers}, a very large category, as well as \textit{People from Caroline County, Virginia}, which is significantly smaller. Wikipedia articles also have many subcategories, creating a hierarchical structure. For example, the \textit{People from Caroline County, Virginia} category is a subcategory of the \textit{People by county in the United States} category.
+
+But in an age of seemingly limitless information easily accessible over the Internet, it becomes difficult for casual users to determine what information is ``worth'' learning: which topics are actually influential and important, and which ones are more in the background?
+
+Wikipedia itself does not differentiate between the ``importance'' of each of its articles. This approach is helpful in preventing any sort of discrimination on their part, but it prevents users from getting an idea of what people, places, or events are the most influential in human history. Because of this, for our project we hope to create a system for determining what topics are the most important.
+
+This is a difficult question to answer, however; you could say that ``United States'' would be a very important article due to the country's large-scale involvement in global politics, but from an astronomer's perspective it's not very relevant. For this reason, our goal is for our solution to be user-driven: any user of our program will be able to input the category that they're interested in, and then our program will determine the most important topics within that category.
+
+One potential criteria for the influence of a topic is how frequently its article is referenced by others on Wikipedia. Intuitively, if an article is linked to often by other articles, it is probably more influential to other topics, of higher quality, and more useful. As mentioned before, since Wikipedia contains a massive amount of different articles and topics, we'll focus on a given (user-selected) category. For our project, our group will investigate this research question:
+\textbf{What are the most frequently referenced articles across Wikipedia pages of a given category?}
 
 \section*{Computational Plan}
 
-TODO
+% 300-500 words
+
+% - explain how you will use trees or graphs
+% - describe the kinds of computations you will perform
+% - explain how your program will report the results of your computations
+
+For our project, we plan on using the Wikipedia API to access article information, via the \texttt{wikipeda-api} Python library. This library will allow us to create \texttt{WikipediaPage} objects based on article titles. This class has various properties, including \texttt{links}, \texttt{back-links}, and \texttt{categories}, which will all be vital in allowing us to model the relationships between articles and categories. These properties are exactly what their names suggest: the \texttt{links} property provides a dictionary of titles to the related \texttt{WikipediaPage} objects that linked to \emph{by this article}, \texttt{back-links} is a similar dictionary except that it includes articles that link \emph{to this page}, and \texttt{categories} is another dictionary containing the categories the article belongs to.
+
+Using the three properties outlined above, we will construct graphs of related articles (within a given category), which will be stored as \texttt{networkx.Graph} objects (or potentially as \texttt{networkx.DiGraph} objects). Each vertex will represent a Wikipedia article, and an edge between vertices signifies that the two pages link to each other. Then, we can perform different computations on these graphs, such as: finding the article in the category with the most back-links overall, finding the article that links to articles from the most other categories, searching for the article with the most back-links from within the selected category, or determining which other category has the most articles in common with the selected category, to give a few examples.
+
+Given enough time, we may also try to model the hierarchical structure of Wikipedia's categories as a tree. This modeling (and possible visualization) will supplement the information given by our graph visualization to give us a better idea of the relationships between articles and categories.
+
+Due to the nature of the API and the scope of the data, there will likely be some limitations on what categories we can feasibly operate on, and the types of computations we can do, as excessively large categories like ``Human activities'' may prove too large to traverse effectively. There is a good chance we will need to make use of \texttt{sys.setrecursionlimit} to increase Python's maximum permitted recursion limit, though we will also have to pay attention to memory usage when doing this.
+
+Once we have modeled our data, we will use \texttt{plotly} to visualize the resulting graphs. Plotly includes various options for modifying the appearance of these visualizations, including node sizes, colours, edge widths, etc., so we can use these options to visualize the results of different questions we might want to ask, such as the article with the most back-links, by setting the node size to the number of back-links to the article.
 
 \section*{References}
-
-TODO
 
 % NOTE: LaTeX does have a built-in way of generating references automatically,
 % but it's a bit tricky to use so we STRONGLY recommend writing your references
 % manually, using a standard academic format like APA or MLA.
 % (E.g., https://owl.purdue.edu/owl/research_and_citation/apa_style/apa_formatting_and_style_guide/general_format.html)
+
+Majlis, M. (n.d.). Wikipedia-API: Python Wrapper for Wikipedia. PyPI. \href{https://pypi.org/project/Wikipedia-API/}{https://pypi.org/project/Wikipedia-API/}
+
+\noindent Network Graphs. (n.d.). Plotly.com. \href{https://plotly.com/python/network-graphs/}{https://plotly.com/python/network-graphs/}
+
+\noindent NetworkX — NetworkX documentation. (n.d.). Networkx.org. \href{https://networkx.org/}{https://networkx.org/}
+
+\noindent Wikipedia contributors. (2021, March 13). William Clark. In Wikipedia, The Free Encyclopedia. Retrieved 15:43, March 15, 2021, from \href{https://en.wikipedia.org/w/index.php?title=William_Clark&oldid=1011838536}{https://en.wikipedia.org/w/index.php?title=William\_Clark\&oldid=1011838536}
 
 \end{document}
