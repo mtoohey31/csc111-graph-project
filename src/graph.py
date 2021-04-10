@@ -26,7 +26,7 @@ def create_digraph(category: str) -> nx.DiGraph:
     mems = cat.categorymembers
     G = nx.DiGraph()
 
-    # Add each page to the graph and add it's wikipediaapi object to the node as an attribute
+    # Add each page to the graph and add its wikipediaapi object to the node as an attribute
     for page in mems:
         G.add_node(page, obj=mems[page])
 
@@ -36,16 +36,27 @@ def create_digraph(category: str) -> nx.DiGraph:
             if linked in mems:
                 G.add_edge(page, linked)
 
+    # Calculate PageRanks for the nodes, and assign them as node attributes
+    page_ranks = calculate_pagerank(G)
+    for node in G.nodes():
+        G.nodes[node]["pagerank"] = page_ranks[node]
     return G
+
+
+def calculate_pagerank(graph: nx.Graph) -> dict:
+    """Use the NetworkX PageRank implementation to
+    calculate the PageRanks for all nodes in the graph.
+    Returns a dictionary of nodes with PageRanks as values."""
+    return nx.algorithms.link_analysis.pagerank(graph)
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
-    import python_ta
-    python_ta.check_all(config={
-        'max-line-length': 100,
-        'extra-imports': ['networkx', 'wikipediaapi'],
-        'max-nested-blocks': 4
-    })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'max-line-length': 100,
+    #     'extra-imports': ['networkx', 'wikipediaapi'],
+    #     'max-nested-blocks': 4
+    # })
