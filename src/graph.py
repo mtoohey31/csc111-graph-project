@@ -46,7 +46,14 @@ def create_digraph(category: str) -> nx.DiGraph:
 def calculate_pagerank(graph: nx.Graph) -> dict:
     """Use the NetworkX PageRank implementation to
     calculate the PageRanks for all nodes in the graph.
-    Returns a dictionary of nodes with PageRanks as values."""
+    Returns a dictionary of nodes with PageRanks as values.
+
+    >>> g = create_digraph('Logic programming languages')
+    >>> from math import isclose
+    >>> page_ranks = calculate_pagerank(g)
+    >>> isclose(sum(val for val in page_ranks.values()), 1)
+    True
+    """
     return nx.algorithms.link_analysis.pagerank(graph)
 
 
