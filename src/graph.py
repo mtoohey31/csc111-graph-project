@@ -36,25 +36,7 @@ def create_digraph(category: str) -> nx.DiGraph:
             if linked in mems:
                 G.add_edge(page, linked)
 
-    # Calculate PageRanks for the nodes, and assign them as node attributes
-    page_ranks = calculate_pagerank(G)
-    for node in G.nodes():
-        G.nodes[node]["pagerank"] = page_ranks[node]
     return G
-
-
-def calculate_pagerank(graph: nx.Graph) -> dict:
-    """Use the NetworkX PageRank implementation to
-    calculate the PageRanks for all nodes in the graph.
-    Returns a dictionary of nodes with PageRanks as values.
-
-    >>> g = create_digraph('Logic programming languages')
-    >>> from math import isclose
-    >>> page_ranks = calculate_pagerank(g)
-    >>> isclose(sum(val for val in page_ranks.values()), 1)
-    True
-    """
-    return nx.algorithms.link_analysis.pagerank(graph)
 
 
 if __name__ == '__main__':

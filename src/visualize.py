@@ -61,14 +61,14 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
-    import python_ta
-    python_ta.check_all(config={
-        'max-line-length': 100,
-        'extra-imports': ['networkx', 'plotly.graph_objs', 'graph'],
-        'max-nested-blocks': 4
-    })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'max-line-length': 100,
+    #     'extra-imports': ['networkx', 'plotly.graph_objs', 'graph'],
+    #     'max-nested-blocks': 4
+    # })
 
-    import graph
-    # visualize_digraph(graph.create_digraph('Procedural programming languages'))  # Large
-    visualize_digraph(graph.create_digraph(
-        'Prolog programming language family'))  # Smaller
+    # import graph
+    # visualize_digraph(graph.create_digraph('Procedural programming languages'))  # Large Test
+    # visualize_digraph(graph.create_digraph(
+    #     'Prolog programming language family'))  # Small Test
