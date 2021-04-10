@@ -10,7 +10,7 @@ NORD = ['#2E3440', '#3B4252', '#434C5E', '#4C566A', '#D8DEE9', '#E5E9F0', '#ECEF
 
 
 def visualize_digraph(graph: nx.DiGraph,
-                      layout: str = 'spring_layout', node_size: int = 20) -> None:
+                      layout: str = 'kamada_kawai_layout', node_size: int = 20) -> None:
     """Visualize the given NetworkX DiGraph."""
     pos = getattr(nx, layout)(graph)
 
@@ -57,6 +57,10 @@ def visualize_digraph(graph: nx.DiGraph,
             opacity=0.25
         )
 
+    fig.update_layout(showlegend=False, title=graph.graph['category'])
+    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
+    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
+
     fig.show()
 
 
@@ -85,15 +89,15 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
             local_backlinks = node[1]['local_backlinks']
             links = node[1]['links']
             backlinks = node[1]['backlinks']
-            labels.append(f'{title} - Score: {sci_score}, Local Links: {local_links},' + \
-                          f' Local Backlinks: {local_backlinks}, Links: {links},' + \
+            labels.append(f'{title} - Score: {sci_score}, Local Links: {local_links},' +
+                          f' Local Backlinks: {local_backlinks}, Links: {links},' +
                           f' Backlinks: {backlinks}')
     else:
         labels = list(graph.nodes())
 
-    scalar = (max_size - min_size) / (max(scores) - min(scores))
+    size_modifier = (max_size - min_size) / (max(scores) - min(scores))
 
-    sizes = [min_size + (size * scalar) for size in scores]
+    sizes = [min_size + (size * size_modifier) for size in scores]
 
     fig = Figure(data=[
         Scatter(x=x_values,
@@ -129,6 +133,10 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
             opacity=0.25
         )
 
+    fig.update_layout(showlegend=False, title=graph.graph['category'])
+    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
+    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
+
     fig.show()
 
 
@@ -136,12 +144,12 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
-    import python_ta
-    python_ta.check_all(config={
-        'max-line-length': 100,
-        'extra-imports': ['networkx', 'plotly.graph_objs', 'graph', 'decimal', 'algorithms'],
-        'max-nested-blocks': 4
-    })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'max-line-length': 100,
+    #     'extra-imports': ['networkx', 'plotly.graph_objs', 'graph', 'decimal', 'algorithms'],
+    #     'max-nested-blocks': 4
+    # })
 
     import graph
 
