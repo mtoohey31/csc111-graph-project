@@ -28,7 +28,7 @@ def create_digraph(category: str) -> nx.DiGraph:
 
     # Add each page to the graph and add its wikipediaapi object to the node as an attribute
     for page in mems:
-        G.add_node(page, obj=mems[page])
+        G.add_node(page, object=mems[page])
 
     # Add links between pages within the cateogory
     for page in mems:
