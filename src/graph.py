@@ -24,7 +24,7 @@ def create_digraph(category: str) -> nx.DiGraph:
         raise ValueError('Category not found.')
 
     mems = cat.categorymembers
-    G = nx.DiGraph()
+    G = nx.DiGraph(category=category)
 
     # Add each page to the graph and add its wikipediaapi object to the node as an attribute
     for page in mems:

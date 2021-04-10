@@ -50,17 +50,18 @@ def visualize_digraph(graph: nx.DiGraph,
             ayref='y',
             text='',
             showarrow=True,
-            arrowhead=3,
+            arrowhead=5,
             arrowsize=1,
             arrowwidth=2,
-            arrowcolor=NORD[1]
+            arrowcolor=NORD[1],
+            opacity=0.25
         )
 
     fig.show()
 
 
 def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
-                       min_size: int = 10, max_size: int = 50) -> None:
+                       min_size: int = 10, max_size: int = 50, link_stats: bool = True) -> None:
     """Visualize the given NetworkX DiGraph and its PageRank properties."""
     pos = getattr(nx, layout)(graph)
 
@@ -73,9 +74,22 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
 
     scores = [node[1]['pagerank'] for node in graph.nodes(data=True)]
 
-    labels = [node[0] + ' - Score: ' + '%.2E' % Decimal(node[1]['pagerank']) + ', Links: ' + str(
-        len(node[1]['object'].backlinks)) + ', Backlinks: ' + str(len(node[1]['object'].backlinks))
-        for node in graph.nodes(data=True)]
+    if link_stats:
+        algorithms.assign_link_stats(graph)
+        labels = []
+
+        for node in graph.nodes(data=True):
+            title = node[0]
+            sci_score = '%.2E' % Decimal(node[1]['pagerank'])
+            local_links = node[1]['local_links']
+            local_backlinks = node[1]['local_backlinks']
+            links = node[1]['links']
+            backlinks = node[1]['backlinks']
+            labels.append(f'{title} - Score: {sci_score}, Local Links: {local_links},' + \
+                          f' Local Backlinks: {local_backlinks}, Links: {links},' + \
+                          f' Backlinks: {backlinks}')
+    else:
+        labels = list(graph.nodes())
 
     scalar = (max_size - min_size) / (max(scores) - min(scores))
 
@@ -108,7 +122,7 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
             ayref='y',
             text='',
             showarrow=True,
-            arrowhead=3,
+            arrowhead=5,
             arrowsize=1,
             arrowwidth=2,
             arrowcolor=NORD[1],
