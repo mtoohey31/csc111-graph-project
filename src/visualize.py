@@ -122,11 +122,11 @@ if __name__ == '__main__':
     #     'max-nested-blocks': 4
     # })
 
-    import graph
+    import wiki_graph
 
     # test_graph = graph.create_digraph(
     #     'Procedural programming languages')  # Large Test
-    test_graph = graph.create_digraph(
+    test_graph = wiki_graph.create_digraph(
         'Prolog programming language family')  # Small Test
 
     # DiGraph test
