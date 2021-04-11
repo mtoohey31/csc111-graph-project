@@ -1,6 +1,8 @@
 """A module to visualize NetworkX graphs in Plotly."""
 
 from decimal import Decimal
+from typing import Any, Union
+
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
 
@@ -23,45 +25,7 @@ def visualize_digraph(graph: nx.DiGraph,
     for i in range(len(graph.nodes)):
         colours.append(NORD[7:][i % len(NORD[7:])])
 
-    fig = Figure(data=[
-        Scatter(x=x_values,
-                y=y_values,
-                mode='markers',
-                name='nodes',
-                marker=dict(symbol='circle-dot',
-                            size=node_size,
-                            color=colours,
-                            line=dict(color=NORD[1], width=0.5),
-                            ),
-                text=labels,
-                hovertemplate='%{text}',
-                hoverlabel={'namelength': 0}
-                )])
-
-    for edge in graph.edges:
-        fig.add_annotation(
-            x=pos[edge[0]][0],
-            y=pos[edge[0]][1],
-            ax=pos[edge[1]][0],
-            ay=pos[edge[1]][1],
-            xref='x',
-            yref='y',
-            axref='x',
-            ayref='y',
-            text='',
-            showarrow=True,
-            arrowhead=5,
-            arrowsize=1,
-            arrowwidth=2,
-            arrowcolor=NORD[1],
-            opacity=0.25
-        )
-
-    fig.update_layout(showlegend=False, title=graph.graph['category'])
-    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
-    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
-
-    fig.show()
+    visualize(x_values, y_values, node_size, colours, labels, graph, pos)
 
 
 def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
@@ -99,6 +63,13 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
 
     sizes = [min_size + (size * size_modifier) for size in scores]
 
+    visualize(x_values, y_values, sizes, colours, labels, graph, pos)
+
+
+def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: list,
+              labels: list, graph: nx.DiGraph, pos: Any) -> None:
+    """Generate the visualization of the given graph, with the given
+    node coordinates, labels, sizes and colours."""
     fig = Figure(data=[
         Scatter(x=x_values,
                 y=y_values,
