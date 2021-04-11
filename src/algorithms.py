@@ -23,6 +23,7 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     """A manual implementation of the PageRank algorithm.
     Calculates the PageRanks for all nodes in the graph, and returns
     a dictionary of nodes with PageRanks as values.
+    Uses the iterative computation method from https://en.wikipedia.org/wiki/PageRank.
 
     >>> import wiki_graph
     >>> g = wiki_graph.create_digraph('Logic programming languages')
