@@ -2,6 +2,22 @@
 pages within certain Wikipedia Categories"""
 import networkx as nx
 from typing import Any
+import plotly
+import wikipediaapi as w
+
+
+def wiki_link_pages(lst: list) -> dict:
+    """Takes a list of page names and returns a dictionary with page names as keys and
+    page urls as values.
+    """
+    wiki = w.Wikipedia('en')
+    urls_so_far = {}
+
+    for elem in lst:
+        page_py = wiki.page(elem)
+        urls_so_far[elem] = page_py.fullurl
+
+    return urls_so_far
 
 
 def top_wiki_pages(g: nx.Graph, n: int) -> list:
@@ -22,6 +38,14 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
         page_links_so_far.append((len(g.adj[page]), page))
 
     return reverse_list_sort(page_links_so_far, n)
+
+
+def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
+    """Returns a list of size n of wiki pages within this category that hold the most links,
+    sorted in ascending order and using pagerank's ranking algoritms. If there is less than n
+    pages within this category, the list will return that amount instead. Wikipages with the
+    same total number of edges will be sorted alphabetically.
+    """
 
 
 def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
@@ -82,23 +106,24 @@ def reverse_list_sort(lst: list, n: int) -> list:
 
     return reversed_lst
 
-def visualize_recommendations() -> None:
+
+def visualize_recommendations(page: str) -> None:
     """ A graphical visualization of the wikipage recommendations.
     """
 
-
+    
 
 if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
 
-#     import python_ta
-#     python_ta.check_all(config={
-#         'max-line-length': 100,
-#         'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
-#         'max-nested-blocks': 4
-#     })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'max-line-length': 100,
+    #     'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
+    #     'max-nested-blocks': 4
+    # })
 
     import wiki_graph
 
