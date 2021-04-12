@@ -39,15 +39,17 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     page_ranks = {}
     size = len(graph.nodes)
     for node in graph.nodes:
-        page_ranks[node] = 1 / size
+        page_ranks[node] = 1.0 / size
+    dangling_nodes = [n for n in graph.nodes if graph.out_degree[n] == 0.0]
     for _ in range(max_iter):
         page_ranks_last = page_ranks
+        danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
         for node in graph.nodes:
-            page_ranks[node] = (1 - alpha) / size
             neighbors = graph.predecessors(node)
-            for n in neighbors:
-                outgoing_degree = graph.out_degree[n]
-                page_ranks[node] += alpha * (page_ranks[n] / outgoing_degree)
+            page_ranks[node] = (1.0 - alpha) / size + \
+                               alpha * sum(page_ranks[n] / graph.out_degree[n]
+                                           for n in neighbors)
+            page_ranks[node] += danglesum / float(size)
         error = sum(abs(page_ranks[n] - page_ranks_last[n]) for n in page_ranks)
         if error < len(graph.nodes) * tol:
             return page_ranks
@@ -67,7 +69,7 @@ def assign_pagerank(graph: nx.Graph, manual: bool = False) -> None:
     """
     # Calculate PageRanks for the nodes, and assign them as node attributes
     if manual:
-        page_ranks = calculate_pagerank_manual(g)
+        page_ranks = calculate_pagerank_manual(graph)
     else:
         page_ranks = calculate_pagerank(graph)
     for node in graph.nodes():
@@ -93,6 +95,7 @@ def assign_link_stats(graph: nx.Graph) -> None:
 
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod()
 
     # import python_ta
@@ -103,6 +106,7 @@ if __name__ == '__main__':
     # })
 
     import wiki_graph
+
     # test_graph = wiki_graph.create_digraph(
     #     'Procedural programming languages')  # Large Test
     test_graph = wiki_graph.create_digraph(
