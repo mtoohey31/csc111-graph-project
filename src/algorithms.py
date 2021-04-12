@@ -46,7 +46,7 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     dangling_nodes = [n for n in graph.nodes if graph.out_degree[n] == 0.0]
     for _ in range(max_iter):
         all_page_ranks.append(page_ranks)
-        page_ranks_last = page_ranks
+        page_ranks_last = page_ranks.copy()
         danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
         for node in graph.nodes:
             neighbors = graph.predecessors(node)
@@ -117,9 +117,11 @@ if __name__ == '__main__':
         'Prolog programming language family')  # Small Test
 
     # PageRank test
-    # assign_pagerank(test_graph)
-    # print(test_graph.nodes(data=True))
+    assign_pagerank(test_graph)
+    print(test_graph.nodes(data=True))
 
     # Stats test
-    assign_link_stats(test_graph)
-    print(test_graph.nodes(data=True))
+    # assign_link_stats(test_graph)
+    # print(test_graph.nodes(data=True))
+
+    print(calculate_pagerank_manual(test_graph))
