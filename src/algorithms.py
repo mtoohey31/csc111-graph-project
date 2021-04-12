@@ -45,7 +45,7 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
         page_ranks[node] = 1.0 / size
     dangling_nodes = [n for n in graph.nodes if graph.out_degree[n] == 0.0]
     for _ in range(max_iter):
-        all_page_ranks.append(page_ranks)
+        all_page_ranks.append(page_ranks.copy())
         page_ranks_last = page_ranks.copy()
         danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
         for node in graph.nodes:
