@@ -111,6 +111,31 @@ def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: 
     fig.show()
 
 
+def visualize_convergence(graph: nx.Graph) -> None:
+    """Visualize the convergence of the manual PageRank algorithm.
+    Note that the results of this algorithm differ slightly from the NetworkX implementation.
+
+    INCOMPLETE AND CURRENTLY NOT NEEDED: manual pagerank implementation converges in 1 iteration"""
+    all_page_ranks = algorithms.calculate_pagerank_manual(graph)
+    print(len(all_page_ranks))
+    article_convergences = dict.fromkeys(all_page_ranks[0].keys(), [])
+    for article in article_convergences:
+        for iteration in all_page_ranks:
+            article_convergences[article].append(iteration[article])
+    times = [i for i in range(len(all_page_ranks))]
+    lines = []
+    for article in article_convergences:
+        article_scatter = Scatter(x=times,
+                                  y=article_convergences[article],
+                                  mode='lines+markers')
+        lines.append(article_scatter)
+    fig = Figure(data=lines)
+    fig.update_layout(showlegend=False, title=graph.graph['category'] + ' PageRank convergence')
+    fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
+    fig.update_yaxes(showgrid=False, zeroline=False, visible=False)
+    fig.show()
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
@@ -135,4 +160,5 @@ if __name__ == '__main__':
     # PageRank test
     import algorithms
     algorithms.assign_pagerank(test_graph)
-    visualize_pagerank(test_graph)
+    # visualize_pagerank(test_graph)
+    visualize_convergence(test_graph)
