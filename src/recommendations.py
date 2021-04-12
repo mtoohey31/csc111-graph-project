@@ -6,16 +6,15 @@ import plotly
 import wikipediaapi as w
 
 
-def wiki_link_pages(lst: list) -> dict:
-    """Takes a list of page names and returns a dictionary with page names as keys and
-    page urls as values.
+def wiki_link_pages(lst: list) -> list:
+    """ Takes a list of page names and returns a tuple with page names and page urls.
     """
     wiki = w.Wikipedia('en')
-    urls_so_far = {}
+    urls_so_far = []
 
     for elem in lst:
         page_py = wiki.page(elem)
-        urls_so_far[elem] = page_py.fullurl
+        urls_so_far.append((elem, page_py.fullurl))
 
     return urls_so_far
 
@@ -111,7 +110,8 @@ def visualize_recommendations(page: str) -> None:
     """ A graphical visualization of the wikipage recommendations.
     """
 
-    
+
+
 
 if __name__ == '__main__':
     import doctest
