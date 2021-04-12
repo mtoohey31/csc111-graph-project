@@ -144,9 +144,14 @@ def visualize_convergence(graph: nx.Graph) -> None:
         article_scatter = Scatter(x=times,
                                   y=article_convergences[article],
                                   mode='lines+markers',
-                                  name=article)
+                                  name=article,
+                                  text=article)
         fig.add_trace(article_scatter)
-    fig.update_layout(showlegend=True, title=graph.graph['category'] + ' PageRank convergence')
+    fig.update_layout(showlegend=True,
+                      title=graph.graph['category'] + ' PageRank convergence',
+                      xaxis_title='Iteration #',
+                      yaxis_title='PageRank Score',
+                      legend_title='Articles')
     fig.update_xaxes(showgrid=True, zeroline=True, visible=True)
     fig.update_yaxes(showgrid=True, zeroline=True, visible=True)
     fig.show()
