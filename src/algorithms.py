@@ -1,4 +1,6 @@
 """Algorithms for analyzing NetworkX DiGraphs based on Wikipedia articles."""
+from typing import List
+
 import networkx as nx
 import wikipediaapi as wa
 
@@ -19,7 +21,7 @@ def calculate_pagerank(graph: nx.Graph) -> dict:
 
 
 def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
-                              max_iter: int = 100, tol=1.0e-6) -> dict:
+                              max_iter: int = 100, tol=1.0e-6) -> List[dict]:
     """A manual implementation of the PageRank algorithm.
     Calculates the PageRanks for all nodes in the graph, and returns
     a dictionary of nodes with PageRanks as values.
@@ -36,13 +38,15 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
         graph = g.to_directed()
     else:
         graph = g
+    all_page_ranks = []
     page_ranks = {}
     size = len(graph.nodes)
     for node in graph.nodes:
         page_ranks[node] = 1.0 / size
     dangling_nodes = [n for n in graph.nodes if graph.out_degree[n] == 0.0]
     for _ in range(max_iter):
-        page_ranks_last = page_ranks
+        page_ranks_last = page_ranks.copy()
+        all_page_ranks.append(page_ranks_last)
         danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
         for node in graph.nodes:
             neighbors = graph.predecessors(node)
@@ -52,7 +56,7 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
             page_ranks[node] += danglesum / float(size)
         error = sum(abs(page_ranks[n] - page_ranks_last[n]) for n in page_ranks)
         if error < len(graph.nodes) * tol:
-            return page_ranks
+            return all_page_ranks + [page_ranks]
     raise ValueError(f'pagerank calculation failed to converge in {max_iter} iterations')
 
 
@@ -69,7 +73,7 @@ def assign_pagerank(graph: nx.Graph, manual: bool = False) -> None:
     """
     # Calculate PageRanks for the nodes, and assign them as node attributes
     if manual:
-        page_ranks = calculate_pagerank_manual(graph)
+        page_ranks = calculate_pagerank_manual(graph)[-1]
     else:
         page_ranks = calculate_pagerank(graph)
     for node in graph.nodes():
@@ -113,9 +117,11 @@ if __name__ == '__main__':
         'Prolog programming language family')  # Small Test
 
     # PageRank test
-    # assign_pagerank(test_graph)
-    # print(test_graph.nodes(data=True))
+    assign_pagerank(test_graph)
+    print(test_graph.nodes(data=True))
 
     # Stats test
-    assign_link_stats(test_graph)
-    print(test_graph.nodes(data=True))
+    # assign_link_stats(test_graph)
+    # print(test_graph.nodes(data=True))
+
+    print(calculate_pagerank_manual(test_graph))
