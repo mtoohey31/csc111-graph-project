@@ -5,6 +5,9 @@ from typing import Any, Union
 
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
 
 # https://www.nordtheme.com/
 NORD = ['#2E3440', '#3B4252', '#434C5E', '#4C566A', '#D8DEE9', '#E5E9F0', '#ECEFF4', '#8FBCBB',
@@ -26,6 +29,29 @@ def visualize_digraph(graph: nx.DiGraph,
         colours.append(NORD[7:][i % len(NORD[7:])])
 
     visualize(x_values, y_values, node_size, colours, labels, graph, pos)
+
+
+def visualize_histograms(graph: nx.DiGraph) -> None:
+    """This function graphs histograms of the inbound and outbound links per page.
+    """
+
+    # extract graph data
+    page_names = [node[0] for node in graph.nodes(data=True)]
+    link_data = [len(node[1]['object'].links) for node in graph.nodes(data=True)]
+    backlink_data = [len(node[1]['object'].backlinks) for node in graph.nodes(data=True)]
+    # create dataframe
+    df = pd.DataFrame()
+    df['page_name'] = page_names
+    df['links'] = link_data
+    df['backlinks'] = backlink_data
+    # create histogram
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(x=link_data, nbinsx=100))
+    fig.add_trace(go.Histogram(x=backlink_data, nbinsx=100))
+
+    fig.update_layout(barmode='stack')
+
+    fig.show()
 
 
 def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
@@ -124,15 +150,18 @@ if __name__ == '__main__':
 
     import wiki_graph
 
-    # test_graph = graph.create_digraph(
-    #     'Procedural programming languages')  # Large Test
     test_graph = wiki_graph.create_digraph(
-        'Prolog programming language family')  # Small Test
+        'Procedural programming languages')  # Large Test
+    # test_graph = wiki_graph.create_digraph(
+    #     'Prolog programming language family')  # Small Test
 
     # DiGraph test
     # visualize_digraph(test_graph)
 
     # PageRank test
-    import algorithms
-    algorithms.assign_pagerank(test_graph)
-    visualize_pagerank(test_graph)
+    # import algorithms
+    # algorithms.assign_pagerank(test_graph)
+    # visualize_pagerank(test_graph)
+
+    # Dual Histogram test
+    visualize_histograms(test_graph)
