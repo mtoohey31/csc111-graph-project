@@ -4,7 +4,7 @@ import networkx as nx
 from typing import Any
 import plotly
 import wikipediaapi as w
-
+import algorithms
 
 def wiki_link_pages(lst: list) -> list:
     """ Takes a list of page names and returns a tuple with page names and page urls.
@@ -21,9 +21,10 @@ def wiki_link_pages(lst: list) -> list:
 
 def top_wiki_pages(g: nx.Graph, n: int) -> list:
     """Returns a list of size n of the wiki pages within this category that hold the most links,
-    sorted in ascending order. If there is less than n pages within this category, the list will
+    sorted in descending order. If there is less than n pages within this category, the list will
     return that amount instead. Wikipages with the same total number of edges will be sorted
-    alphabetically.
+    alphabetically. This is a more basic and straightforward ranking approach compared to
+    top_wiki_pagerank_pages().
 
     >>> import wiki_graph
     >>> test_graph = wiki_graph.create_digraph('Prolog programming language family')
@@ -32,7 +33,7 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
     """
     page_links_so_far = []
 
-    # Appending the similarity score and it's successive page
+    # Appending a tuple that consists of the number of links of a node and that node aswell.
     for page in set(g.nodes):
         page_links_so_far.append((len(g.adj[page]), page))
 
@@ -40,16 +41,24 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
 
 
 def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
-    """Returns a list of size n of wiki pages within this category that hold the most links,
-    sorted in ascending order and using pagerank's ranking algoritms. If there is less than n
-    pages within this category, the list will return that amount instead. Wikipages with the
-    same total number of edges will be sorted alphabetically.
+    """Returns a list of size n of wiki pages within this category that hold the most importance,
+    according to pagerank's numerical weighting algorithms. The list is sorted in descending order,
+    where the first element is the most important wiki page in this category. If there is less than
+    n pages within this category, the list will return that amount instead. Wikipages that happen
+    to have the same value of importance will be then sorted alphabetically.
     """
+    page_links_so_far = []
+
+    # Appending each node and it's pagerank using the calculate_pagerank function from algorithms
+    for page in set(g.nodes):
+        page_links_so_far.append((algorithms.calculate_pagerank(g), page))
+
+    return reverse_list_sort(page_links_so_far, n)
 
 
 def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
     """ Returns a list of n wikipage recommendations based on the similarity score of
-    page and all other nodes within this nx.graph. Sorted in ascending order, pages with
+    page and all other nodes within this nx.graph. Sorted in descending order, pages with
     a similarity score of 0 will not be included in this list. The list may be less than
     size n if there are fewer recommendations that meet the criteria.
     """
@@ -106,10 +115,16 @@ def reverse_list_sort(lst: list, n: int) -> list:
     return reversed_lst
 
 
-def visualize_recommendations(page: str) -> None:
-    """ A graphical visualization of the wikipage recommendations.
+def visualize_rankings(page: str) -> None:
+    """ A graphical visualization comparison of the results of the top wiki pages
+    in different categories using the two ranking approaches.
     """
 
+
+def visualiza_reccomdations() -> None:
+    """ A graphical visualization of the top recommendations of wiki pages given to the user
+    for a particular wikipedia page.
+    """
 
 
 
