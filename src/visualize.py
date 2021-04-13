@@ -130,7 +130,7 @@ def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: 
     fig.show()
 
 
-def visualize_convergence(graph: nx.Graph) -> None:
+def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
     """Visualize the convergence of the manual PageRank algorithm.
     Note that the results of this algorithm differ slightly from the NetworkX implementation.
     """
@@ -153,7 +153,10 @@ def visualize_convergence(graph: nx.Graph) -> None:
                       yaxis_title='PageRank Score',
                       legend_title='Articles')
     fig.update_xaxes(showgrid=True, zeroline=True, visible=True)
-    fig.update_yaxes(showgrid=True, zeroline=True, visible=True)
+    if log_yaxis:
+        fig.update_yaxes(showgrid=True, zeroline=True, visible=True, type="log")
+    else:
+        fig.update_yaxes(showgrid=True, zeroline=True, visible=True)
     fig.show()
 
 
