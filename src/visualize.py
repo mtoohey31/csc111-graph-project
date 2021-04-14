@@ -24,6 +24,9 @@ def visualize_digraph(graph: nx.DiGraph,
 
 def visualize_histograms(graph: nx.DiGraph) -> None:
     """This function graphs histograms of the inbound and outbound links per page.
+
+    Preconditions:
+        - algorithms.assign_link_stats has been called on graph
     """
 
     # extract graph data
@@ -49,7 +52,12 @@ def visualize_histograms(graph: nx.DiGraph) -> None:
 
 def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
                        min_size: int = 10, max_size: int = 50, link_stats: bool = True) -> None:
-    """Visualize the given NetworkX DiGraph and its PageRank properties."""
+    """Visualize the given NetworkX DiGraph and its PageRank properties.
+
+    Preconditions:
+        - algorithms.assign_pagerank has been called on graph
+        - layout in networkx.drawing.layout
+    """
     pos = getattr(nx, layout)(graph)
 
     x_values = [pos[k][0] for k in graph.nodes]

@@ -28,6 +28,10 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     Uses the iterative computation method from https://en.wikipedia.org/wiki/PageRank.
     Note that the results of this algorithm differ slightly from the NetworkX implementation.
 
+    Preconditions:
+        - 0 <= alpha <= 1
+        - max_iter >= 1
+
     >>> import wiki_graph
     >>> g = wiki_graph.create_digraph('Logic programming languages')
     >>> from math import isclose
