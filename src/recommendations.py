@@ -2,14 +2,12 @@
 pages within certain Wikipedia Categories"""
 import networkx as nx
 from typing import Any
+import wiki_graph
 import algorithms
-
 import wikipediaapi as w
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
-import wiki_graph
 
 
 def wiki_link_pages(lst: list) -> list:
@@ -61,11 +59,11 @@ def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
     If there is less than n pages within this category, the list will return that amount instead.
     """
     page_links_so_far = []
-    dict = algorithms.calculate_pagerank(g)
+    dict_pages = algorithms.calculate_pagerank(g)
 
     # Appending each node and it's pagerank using the calculate_pagerank function from algorithms
-    for page in dict:
-        page_links_so_far.append((dict[page], page))
+    for page in dict_pages:
+        page_links_so_far.append((dict_pages[page], page))
 
     # Sorting the list accumulator and then taking the last n elements of that list to
     # Obtain the top n wikipages
@@ -94,7 +92,7 @@ def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
     return reverse_list_sort(scores_so_far, n)
 
 
-def similarity_score(self: Any, other: Any, g: nx.graph) -> float:
+def similarity_score(self: Any, other: Any, g: nx.Graph) -> float:
     """Return the similarity score between self and other. Based upon the similarity score from
     A3.
     """
@@ -150,14 +148,14 @@ def visualize_rankings(cat: str, n: int) -> None:
         pass
     elif n < 0:
         print('You can\'t ask for an empty visualization!'
-              '\nTry recalling this function and asking for at least one or more top pages. ')
+              '\nTry recalling this function and asking for at least one or more top pages.')
     else:
-
+        # Creating the networkx graph for the visualization and it's respective ranked lists
         g = wiki_graph.create_digraph(cat)
-
         lst_basic = top_wiki_pages(g, n)
         lst_pagerank = top_wiki_pagerank_pages(g, n)
 
+        # Unpacking each list tuple and separating them into two lists for reach ranked list
         x_basic = []
         y_basic = []
 
@@ -172,18 +170,55 @@ def visualize_rankings(cat: str, n: int) -> None:
             x_pagerank.append(elem[1])
             y_pagerank.append(elem[0])
 
-        fig = make_subplots(
-            rows=3, cols=1,
-            shared_xaxes=True,
-            vertical_spacing=0.03,
-            specs=[[{"type": "table"}],
-                   [{"type": "Figure"}],
-                   [{"type": "Figure"}]]
+        n = max(len(x_basic), len(y_basic))
+
+        # Creating the subplots for each Figure on the page
+        fig = make_subplots(rows=3, cols=1,
+                            shared_xaxes=True,
+                            vertical_spacing=0.1,
+                            specs=[[{"type": "table"}],
+                                   [{"type": "xy"}],
+                                   [{"type": "xy"}]],
+                            subplot_titles=("Comparison Chart of Top Ranked Pages from Both "
+                                            "Algorithms", "Top Ranked Wikipedia Pages using the"
+                                            " Basic Algorithm (Pages vs Number of Connections)",
+                                            "Top Ranked Wikipedia Pages using Pagerank's Page"
+                                            " Importance Algorithm (Pages vs Page Importance"
+                                            " Score)"))
+
+        # Creating our Table Figure
+        fig.add_trace(
+            go.Table(
+                header=dict(
+                    values=['RANK', 'BASIC ALGORITHM: PAGE NAME', 'BASIC ALGORITHM: CONNECTION'
+                                                                  ' SCORE', 'PAGERANK: PAGE NAME',
+                            'PAGERANK: IMPORTANCE SCORE'],
+                    font=dict(size=10),
+                    align="left"
+                ),
+                cells=dict(
+                    values=[
+                        [x for x in range(1, n + 1)],
+                        x_basic,
+                        y_basic,
+                        x_pagerank,
+                        y_pagerank
+                    ],
+                    align="left")
+            ),
+            row=1, col=1
         )
+        # Creating our first Bar Graph Figure
+        fig.add_trace(go.Bar(x=x_basic, y=y_basic,
+                             marker=dict(color=[x for x in range(1, len(x_basic) + 1)])),
+                      row=2, col=1)
+        # Creating our second Bar Graph Figure
+        fig.add_trace(go.Bar(x=x_pagerank, y=y_pagerank,
+                             marker=dict(color=[x for x in range(1, len(x_pagerank) + 1)])),
+                      row=3, col=1)
 
-        fig.add_trace(go.Figure([go.Bar(x=x_basic, y=y_basic)]))
-        fig.add_trace(go.Figure([go.Bar(x=x_pagerank, y=y_pagerank)]))
-
+        fig.update_layout(title_text="Top Ranking Wikipedia Pages within Category: " + cat,
+                          showlegend=False)
         fig.show()
 
 
@@ -211,9 +246,9 @@ def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
         similarity_scores = [lst[x][0] for x in range(0, n)]
         urls = [lst_urls[x][1] for x in range(0, n)]
 
-        headerColor = 'blue'
-        rowEvenColor = '#D1EEEE'
-        rowOddColor = 'white'
+        header_color = 'blue'
+        row_even_color = '#D1EEEE'
+        row_odd_color = 'white'
 
         # Creating the chart figure using the above list and other personalized specifics
         fig = go.Figure(data=[go.Table(
@@ -221,7 +256,7 @@ def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
             header=dict(
                 values=['<b>RECOMMENDED PAGES</b>', '<b>SIMILARITY SCORE</b>', '<b>URL</b>'],
                 line_color='darkslategray',
-                fill_color=headerColor,
+                fill_color=header_color,
                 align=['left', 'center'],
                 font=dict(color='white', size=12)
             ),
@@ -233,7 +268,7 @@ def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
                 line_color='darkslategray',
 
                 # 2-D list of colors for alternating rows
-                fill_color=[[rowOddColor, rowEvenColor] * n],
+                fill_color=[[row_odd_color, row_even_color] * n],
                 align=['left', 'center'],
                 font=dict(color='darkslategray', size=11)
             ))
@@ -251,22 +286,21 @@ if __name__ == '__main__':
 
     doctest.testmod()
 
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 100,
-    #     'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
-    #     'max-nested-blocks': 4
-    # })
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 100,
+        'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
+        'max-nested-blocks': 4
+    })
 
     # import wiki_graph
 
     # test_graph = wiki_graph.create_digraph(
-    #     'Procedural programming languages')  # Large Test
+    #     'Procedural programming languages')
 
-    # test_graph = wiki_graph.create_digraph(
-    #     'Prolog programming language family')  # Small Test
-
-    # test = top_wiki_pages(test_graph, 5)
-    # top_wiki_page_recommendations(test[0][1], 10, test_graph)
+    # test = top_wiki_pages(test_graph, 25)
+    # test2 = top_wiki_pagerank_pages(test_graph, 25)
+    # top_wiki_page_recommendations(test[0][1], 15, test_graph)
 
     # visualize_recommendation(test[0][1], 100, test_graph)
+    # visualize_rankings('Procedural programming languages', 100)
