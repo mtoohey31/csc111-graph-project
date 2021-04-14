@@ -191,8 +191,7 @@ def visualize_rankings(cat: str, n: int) -> None:
             go.Table(
                 header=dict(
                     values=['RANK', 'BASIC ALGORITHM: PAGE NAME', 'BASIC ALGORITHM: CONNECTION'
-                                                                  ' SCORE', 'PAGERANK: PAGE NAME',
-                            'PAGERANK: IMPORTANCE SCORE'],
+                            ' SCORE', 'PAGERANK: PAGE NAME', 'PAGERANK: IMPORTANCE SCORE'],
                     font=dict(size=10),
                     align="left"
                 ),
