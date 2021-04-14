@@ -131,8 +131,9 @@ def reverse_list_sort(lst: list, n: int) -> list:
 
 
 def visualize_rankings(cat: str, n: int) -> None:
-    """ A graphical visualization comparison of the results of the top wiki pages
-    in different categories using the two ranking approaches.
+    """ A graphical visualization that takes in a category from a user and then compares 
+    the top ranked pages within that category using two different ranking approaches. The 
+    resulting figure consists of a comparison chart and a bar graph for each ranked list. 
     """
     # Ensuring that we avoid a lengthy exception block if the user enters a category that does
     # not exist
@@ -222,8 +223,11 @@ def visualize_rankings(cat: str, n: int) -> None:
 
 
 def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
-    """ A chart visualization of the (at most) top n recommendations of wiki pages given to the user
-    for a particular wikipedia page.
+    """ A chart visualization that takes in a page that exists in a networkx graph and 
+    returns a chart visual that displays at most n other wikipedia page recommendations 
+    in the same category the graph is based on. Recommendations are generated from
+    top_wiki_page_recommendations() using a similarity score based upon the weightless
+    version from A3. 
     """
     # Error Catching
     if page not in g.nodes:
@@ -284,13 +288,13 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-
-    import python_ta
-    python_ta.check_all(config={
-        'max-line-length': 100,
-        'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
-        'max-nested-blocks': 4
-    })
+    # 
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'max-line-length': 100,
+    #     'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
+    #     'max-nested-blocks': 4
+    # })
 
     # import wiki_graph
 
