@@ -26,12 +26,13 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     Calculates the PageRanks for all nodes in the graph, and returns
     a dictionary of nodes with PageRanks as values.
     Uses the iterative computation method from https://en.wikipedia.org/wiki/PageRank.
+    Note that the results of this algorithm differ slightly from the NetworkX implementation.
 
     >>> import wiki_graph
     >>> g = wiki_graph.create_digraph('Logic programming languages')
     >>> from math import isclose
     >>> page_ranks = calculate_pagerank_manual(g)
-    >>> isclose(sum(val for val in page_ranks.values()), 1)
+    >>> isclose(sum(val for val in page_ranks[-1].values()), 1, abs_tol=0.05)
     True
     """
     if not g.is_directed():
@@ -118,9 +119,8 @@ if __name__ == '__main__':
     # PageRank test
     assign_pagerank(test_graph)
     print(test_graph.nodes(data=True))
+    print(calculate_pagerank_manual(test_graph))
 
     # Stats test
     # assign_link_stats(test_graph)
     # print(test_graph.nodes(data=True))
-
-    print(calculate_pagerank_manual(test_graph))

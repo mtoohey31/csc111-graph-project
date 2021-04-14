@@ -82,14 +82,15 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
 
 
 def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
-    """Visualize the convergence of the manual PageRank algorithm.
-    Note that the results of this algorithm differ slightly from the NetworkX implementation.
-    """
+    """Visualize the convergence of the manual PageRank algorithm."""
+    # construct dictionary mapping article to a list of PageRank scores, one for each iteration
     all_page_ranks = algorithms.calculate_pagerank_manual(graph)
     article_convergences = dict.fromkeys(all_page_ranks[0].keys(), [])
     for article in article_convergences:
         article_convergences[article] = [iteration[article]
                                          for iteration in all_page_ranks]
+
+    # generate line graph using plotly
     times = list(range(len(all_page_ranks)))
     fig = Figure()
     for article in article_convergences:

@@ -1,0 +1,12 @@
+# CSC111 Winter 2021 Final Project Requirements
+
+# Testing and code checking
+python-ta~=1.6.3
+
+# Graphics and data visualization
+plotly
+pandas
+networkx
+
+# Wikipedia API access
+wikipedia-api
