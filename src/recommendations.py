@@ -2,12 +2,14 @@
 pages within certain Wikipedia Categories"""
 import networkx as nx
 from typing import Any
+import algorithms
 
 import wikipediaapi as w
-import algorithms
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+
+import wiki_graph
 
 
 def wiki_link_pages(lst: list) -> list:
@@ -32,10 +34,9 @@ def wiki_link_pages(lst: list) -> list:
 
 def top_wiki_pages(g: nx.Graph, n: int) -> list:
     """ Returns a list of size n wiki pages within this category that hold the most connections
-    to other pages and the number of their connections, sorted in descending order. If there is
-    less than n pages within this category, the list will return that amount instead. Wikipages
-    with the same total number of edges will be sorted alphabetically. This is a more basic and
-    straightforward ranking approach compared to top_wiki_pagerank_pages().
+    to other pages, and the number of their connections, sorted in descending order. If there is
+    less than n pages within this category, the list will return that amount instead. This is a
+    more basic and straightforward ranking approach compared to top_wiki_pagerank_pages().
 
     >>> import wiki_graph
     >>> test_graph = wiki_graph.create_digraph('Prolog programming language family')
@@ -56,9 +57,8 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
 def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
     """Returns a list of size n of wiki pages within this category that hold the most importance,
     according to pagerank's numerical weighting algorithms. The list is sorted in descending order,
-    where the first element is the most important wiki page in this category. If there is less than
-    n pages within this category, the list will return that amount instead. Wikipages that happen
-    to have the same value of importance are sorted alphabetically.
+    where each tuple's first element is the importance score and the second is the name of the page.
+    If there is less than n pages within this category, the list will return that amount instead.
     """
     page_links_so_far = []
     dict = algorithms.calculate_pagerank(g)
@@ -73,10 +73,10 @@ def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
 
 
 def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
-    """ Returns a list of n wikipage recommendations based on the similarity score of
-    page and all other nodes within this nx.graph. Sorted in descending order, pages with
-    a similarity score of 0 will not be included in this list. The list may be less than
-    size n if there are fewer recommendations that meet the criteria.
+    """ Returns a list of n wikipage recommendations and their score of how similar they are to all
+    other nodes within the graph. Sorted in descending order, pages with a similarity score of 0
+    will not be included in this list. The list may be less than size n if there are fewer
+    recommendations that meet the criteria.
     """
     # Turns the networkx node objects into a readable set
     pages = set(g.nodes)
@@ -126,65 +126,124 @@ def reverse_list_sort(lst: list, n: int) -> list:
 
     count = -1
     while count != -n - 1:
-        reversed_lst.append((lst[count][0],lst[count][1]))
+        reversed_lst.append((lst[count][0], lst[count][1]))
         count -= 1
 
     return reversed_lst
 
 
-def visualize_rankings(g: nx.Graph, n: int) -> None:
+def visualize_rankings(cat: str, n: int) -> None:
     """ A graphical visualization comparison of the results of the top wiki pages
     in different categories using the two ranking approaches.
     """
+    # Ensuring that we avoid a lengthy exception block if the user enters a category that does
+    # not exist
+    cond = False
+    try:
+        wiki_graph.create_digraph(cat)
+    except ValueError:
+        print('That category doesn\'t exist! Try recalling the function with another one.')
+        cond = True
 
-    # fig = make_subplots(
-    #     rows=3, cols=1,
-    #     shared_xaxes=True,
-    #     vertical_spacing=0.03,
-    #     specs=[[{"type": "table"}],
-    #            [{"type": "scatter"}],
-    #            [{"type": "scatter"}]]
-    # )
-    #
-    # fig.add_trace(
-    #
-    # )
-    #
-    # fig.add_trace(
-    #
-    # )
-    #
-    # fig.add_trace(
-    #     go.Table(
-    #         header=dict(
-    #             values=["Date", "Number<br>Transactions", "Output<br>Volume (BTC)",
-    #                     "Market<br>Price", "Hash<br>Rate", "Cost per<br>trans-USD",
-    #                     "Mining<br>Revenue-USD", "Trasaction<br>fees-BTC"],
-    #             font=dict(size=10),
-    #             align="left"
-    #         ),
-    #         cells=dict(
-    #             values=,
-    #             align="left")
-    #     ),
-    #     row=1, col=1
-    # )
-    # fig.update_layout(
-    #     height=800,
-    #     showlegend=False,
-    #     title_text="Bitcoin mining stats for 180 days",
-    # )
-    #
-    # fig.show()
+    # Catching for user input errors
+    if cond:
+        pass
+    elif n < 0:
+        print('You can\'t ask for an empty visualization!'
+              '\nTry recalling this function and asking for at least one or more top pages. ')
+    else:
+
+        g = wiki_graph.create_digraph(cat)
+
+        lst_basic = top_wiki_pages(g, n)
+        lst_pagerank = top_wiki_pagerank_pages(g, n)
+
+        x_basic = []
+        y_basic = []
+
+        for elem in lst_basic:
+            x_basic.append(elem[1])
+            y_basic.append(elem[0])
+
+        x_pagerank = []
+        y_pagerank = []
+
+        for elem in lst_pagerank:
+            x_pagerank.append(elem[1])
+            y_pagerank.append(elem[0])
+
+        fig = make_subplots(
+            rows=3, cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.03,
+            specs=[[{"type": "table"}],
+                   [{"type": "Figure"}],
+                   [{"type": "Figure"}]]
+        )
+
+        fig.add_trace(go.Figure([go.Bar(x=x_basic, y=y_basic)]))
+        fig.add_trace(go.Figure([go.Bar(x=x_pagerank, y=y_pagerank)]))
+
+        fig.show()
 
 
-
-def visualize_recommendation(page: str) -> None:
-    """ A graphical visualization of the top recommendations of wiki pages given to the user
+def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
+    """ A chart visualization of the (at most) top n recommendations of wiki pages given to the user
     for a particular wikipedia page.
     """
+    # Error Catching
+    if page not in g.nodes:
+        print('That page doesn\'t seem to exist in this category!\n'
+              'Try recalling the function with another one.')
+    elif n < 1:
+        print('You can\'t ask for an empty graph!\nTry recalling the function and asking for at '
+              'least one or more recommendations.')
+    else:
 
+        # Obtaining list of recommendations and their successive URLs
+        lst = top_wiki_page_recommendations(page, n, g)
+        lst_urls = wiki_link_pages(lst)
 
+        n = len(lst)
+
+        # Updating the above lists to obtain the values for our chart
+        page_names = [lst[x][1] for x in range(0, n)]
+        similarity_scores = [lst[x][0] for x in range(0, n)]
+        urls = [lst_urls[x][1] for x in range(0, n)]
+
+        headerColor = 'blue'
+        rowEvenColor = '#D1EEEE'
+        rowOddColor = 'white'
+
+        # Creating the chart figure using the above list and other personalized specifics
+        fig = go.Figure(data=[go.Table(
+            columnwidth=[150, 80, 320],
+            header=dict(
+                values=['<b>RECOMMENDED PAGES</b>', '<b>SIMILARITY SCORE</b>', '<b>URL</b>'],
+                line_color='darkslategray',
+                fill_color=headerColor,
+                align=['left', 'center'],
+                font=dict(color='white', size=12)
+            ),
+            cells=dict(
+                values=[
+                    page_names,
+                    similarity_scores,
+                    urls],
+                line_color='darkslategray',
+
+                # 2-D list of colors for alternating rows
+                fill_color=[[rowOddColor, rowEvenColor] * n],
+                align=['left', 'center'],
+                font=dict(color='darkslategray', size=11)
+            ))
+        ])
+        fig.update_layout(
+            title_text='<b>Based on your interest in<b> \"' + page + '\", <b>here\'s<b> '
+                       + str(n) + ' <b>other Wikipages we recommend you visit.<b>'
+        )
+
+        fig.show()
 
 
 if __name__ == '__main__':
@@ -199,15 +258,15 @@ if __name__ == '__main__':
     #     'max-nested-blocks': 4
     # })
 
-    import wiki_graph
+    # import wiki_graph
 
     # test_graph = wiki_graph.create_digraph(
     #     'Procedural programming languages')  # Large Test
-    test_graph = wiki_graph.create_digraph(
-        'Prolog programming language family')  # Small Test
 
-    top_wiki_pages(test_graph, 5)
-    test = top_wiki_pages(test_graph, 5)
-    test2 = top_wiki_pagerank_pages(test_graph, 5)
-    
-    top_wiki_page_recommendations(test[0][1], 10, test_graph)
+    # test_graph = wiki_graph.create_digraph(
+    #     'Prolog programming language family')  # Small Test
+
+    # test = top_wiki_pages(test_graph, 5)
+    # top_wiki_page_recommendations(test[0][1], 10, test_graph)
+
+    # visualize_recommendation(test[0][1], 100, test_graph)
