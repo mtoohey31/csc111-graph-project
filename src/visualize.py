@@ -10,6 +10,8 @@ import plotly.graph_objects as go
 import pandas as pd
 
 # https://www.nordtheme.com/
+import algorithms
+
 NORD = ['#2E3440', '#3B4252', '#434C5E', '#4C566A', '#D8DEE9', '#E5E9F0', '#ECEFF4', '#8FBCBB',
         '#88C0D0', '#81A1C1', '#5E81AC', '#BF616A', '#D08770', '#EBCB8B', '#A3BE8C', '#B48EAD']
 
@@ -92,6 +94,36 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
     visualize(x_values, y_values, sizes, colours, labels, graph, pos)
 
 
+def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
+    """Visualize the convergence of the manual PageRank algorithm.
+    Note that the results of this algorithm differ slightly from the NetworkX implementation.
+    """
+    all_page_ranks = algorithms.calculate_pagerank_manual(graph)
+    article_convergences = dict.fromkeys(all_page_ranks[0].keys(), [])
+    for article in article_convergences:
+        article_convergences[article] = [iteration[article] for iteration in all_page_ranks]
+    times = [i for i in range(len(all_page_ranks))]
+    fig = Figure()
+    for article in article_convergences:
+        article_scatter = Scatter(x=times,
+                                  y=article_convergences[article],
+                                  mode='lines+markers',
+                                  name=article,
+                                  text=article)
+        fig.add_trace(article_scatter)
+    fig.update_layout(showlegend=True,
+                      title=graph.graph['category'] + ' PageRank convergence',
+                      xaxis_title='Iteration #',
+                      yaxis_title='PageRank Score',
+                      legend_title='Articles')
+    fig.update_xaxes(showgrid=True, zeroline=True, visible=True)
+    if log_yaxis:
+        fig.update_yaxes(showgrid=True, zeroline=True, visible=True, type="log")
+    else:
+        fig.update_yaxes(showgrid=True, zeroline=True, visible=True)
+    fig.show()
+
+
 def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: list,
               labels: list, graph: nx.DiGraph, pos: Any) -> None:
     """Generate the visualization of the given graph, with the given
@@ -150,10 +182,10 @@ if __name__ == '__main__':
 
     import wiki_graph
 
-    test_graph = wiki_graph.create_digraph(
-        'Procedural programming languages')  # Large Test
     # test_graph = wiki_graph.create_digraph(
-    #     'Prolog programming language family')  # Small Test
+    #    'Procedural programming languages')  # Large Test
+    test_graph = wiki_graph.create_digraph(
+         'Prolog programming language family')  # Small Test
 
     # DiGraph test
     # visualize_digraph(test_graph)
@@ -162,6 +194,8 @@ if __name__ == '__main__':
     # import algorithms
     # algorithms.assign_pagerank(test_graph)
     # visualize_pagerank(test_graph)
+    # PageRank convergence test
+    visualize_convergence(test_graph)
 
     # Dual Histogram test
     visualize_histograms(test_graph)

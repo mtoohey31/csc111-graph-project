@@ -50,10 +50,9 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
         danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
         for node in graph.nodes:
             neighbors = graph.predecessors(node)
-            page_ranks[node] = (1.0 - alpha) / size + \
-                               alpha * sum(page_ranks[n] / graph.out_degree[n]
+            page_ranks[node] = alpha * sum(page_ranks[n] / graph.out_degree[n]
                                            for n in neighbors)
-            page_ranks[node] += danglesum / float(size)
+            page_ranks[node] += (1.0 - alpha) / size + danglesum / float(size)
         error = sum(abs(page_ranks[n] - page_ranks_last[n]) for n in page_ranks)
         if error < len(graph.nodes) * tol:
             return all_page_ranks + [page_ranks]
