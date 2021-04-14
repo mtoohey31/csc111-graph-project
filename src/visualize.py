@@ -2,18 +2,11 @@
 
 from decimal import Decimal
 from typing import Any, Union
-
 import networkx as nx
 from plotly.graph_objs import Scatter, Figure
-import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-
-# https://www.nordtheme.com/
 import algorithms
-
-NORD = ['#2E3440', '#3B4252', '#434C5E', '#4C566A', '#D8DEE9', '#E5E9F0', '#ECEFF4', '#8FBCBB',
-        '#88C0D0', '#81A1C1', '#5E81AC', '#BF616A', '#D08770', '#EBCB8B', '#A3BE8C', '#B48EAD']
 
 
 def visualize_digraph(graph: nx.DiGraph,
@@ -26,11 +19,7 @@ def visualize_digraph(graph: nx.DiGraph,
 
     labels = list(graph.nodes())
 
-    colours = []
-    for i in range(len(graph.nodes)):
-        colours.append(NORD[7:][i % len(NORD[7:])])
-
-    visualize(x_values, y_values, node_size, colours, labels, graph, pos)
+    visualize(x_values, y_values, node_size, labels, graph, pos)
 
 
 def visualize_histograms(graph: nx.DiGraph) -> None:
@@ -39,8 +28,10 @@ def visualize_histograms(graph: nx.DiGraph) -> None:
 
     # extract graph data
     page_names = [node[0] for node in graph.nodes(data=True)]
-    link_data = [len(node[1]['object'].links) for node in graph.nodes(data=True)]
-    backlink_data = [len(node[1]['object'].backlinks) for node in graph.nodes(data=True)]
+    link_data = [len(node[1]['object'].links)
+                 for node in graph.nodes(data=True)]
+    backlink_data = [len(node[1]['object'].backlinks)
+                     for node in graph.nodes(data=True)]
     # create dataframe
     df = pd.DataFrame()
     df['page_name'] = page_names
@@ -63,10 +54,6 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
 
     x_values = [pos[k][0] for k in graph.nodes]
     y_values = [pos[k][1] for k in graph.nodes]
-
-    colours = []
-    for i in range(len(graph.nodes)):
-        colours.append(NORD[7:][i % len(NORD[7:])])
 
     scores = [node[1]['pagerank'] for node in graph.nodes(data=True)]
 
@@ -91,7 +78,7 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
 
     sizes = [min_size + (size * size_modifier) for size in scores]
 
-    visualize(x_values, y_values, sizes, colours, labels, graph, pos)
+    visualize(x_values, y_values, sizes, labels, graph, pos)
 
 
 def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
@@ -101,8 +88,9 @@ def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
     all_page_ranks = algorithms.calculate_pagerank_manual(graph)
     article_convergences = dict.fromkeys(all_page_ranks[0].keys(), [])
     for article in article_convergences:
-        article_convergences[article] = [iteration[article] for iteration in all_page_ranks]
-    times = [i for i in range(len(all_page_ranks))]
+        article_convergences[article] = [iteration[article]
+                                         for iteration in all_page_ranks]
+    times = list(range(len(all_page_ranks)))
     fig = Figure()
     for article in article_convergences:
         article_scatter = Scatter(x=times,
@@ -118,14 +106,15 @@ def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
                       legend_title='Articles')
     fig.update_xaxes(showgrid=True, zeroline=True, visible=True)
     if log_yaxis:
-        fig.update_yaxes(showgrid=True, zeroline=True, visible=True, type="log")
+        fig.update_yaxes(showgrid=True, zeroline=True,
+                         visible=True, type="log")
     else:
         fig.update_yaxes(showgrid=True, zeroline=True, visible=True)
     fig.show()
 
 
-def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: list,
-              labels: list, graph: nx.DiGraph, pos: Any) -> None:
+def visualize(x_values: list, y_values: list, sizes: Union[list, int], labels: list,
+              graph: nx.DiGraph, pos: Any) -> None:
     """Generate the visualization of the given graph, with the given
     node coordinates, labels, sizes and colours."""
     fig = Figure(data=[
@@ -135,8 +124,7 @@ def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: 
                 name='nodes',
                 marker=dict(symbol='circle-dot',
                             size=sizes,
-                            color=colours,
-                            line=dict(color=NORD[1], width=0.5),
+                            line=dict(width=0.5),
                             ),
                 text=labels,
                 hovertemplate='%{text}',
@@ -158,7 +146,6 @@ def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: 
             arrowhead=5,
             arrowsize=1,
             arrowwidth=2,
-            arrowcolor=NORD[1],
             opacity=0.25
         )
 
@@ -176,7 +163,8 @@ if __name__ == '__main__':
     # import python_ta
     # python_ta.check_all(config={
     #     'max-line-length': 100,
-    #     'extra-imports': ['networkx', 'plotly.graph_objs', 'graph', 'decimal', 'algorithms'],
+    #     'extra-imports': ['networkx', 'plotly.graph_objs', 'plotly.graph_objects', 'wiki_graph',
+    #                       'decimal', 'algorithms', 'pandas'],
     #     'max-nested-blocks': 4
     # })
 
@@ -185,17 +173,17 @@ if __name__ == '__main__':
     # test_graph = wiki_graph.create_digraph(
     #    'Procedural programming languages')  # Large Test
     test_graph = wiki_graph.create_digraph(
-         'Prolog programming language family')  # Small Test
+        'Prolog programming language family')  # Small Test
 
     # DiGraph test
     # visualize_digraph(test_graph)
 
     # PageRank test
-    # import algorithms
     # algorithms.assign_pagerank(test_graph)
     # visualize_pagerank(test_graph)
+
     # PageRank convergence test
-    visualize_convergence(test_graph)
+    # visualize_convergence(test_graph)
 
     # Dual Histogram test
-    visualize_histograms(test_graph)
+    # visualize_histograms(test_graph)
