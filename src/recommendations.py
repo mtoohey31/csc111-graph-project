@@ -2,18 +2,50 @@
 pages within certain Wikipedia Categories"""
 import networkx as nx
 from typing import Any
-import wiki_graph
 import algorithms
 import wikipediaapi as w
+import pprint
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
+def print_lst(num: int, g: nx.Graph, n: int, page: str = None) -> None:
+    """ Function used for main.py. The parameter n is either a one, two or three,
+    which will call and print the resulting list of its corresponding ranking function.
+
+    Preconditions:
+    - num in {1, 2, 3}
+    - n > 0
+    """
+    # If num is one, we call and and print out top_wiki_pages
+    if num == 1:
+        lst = top_wiki_pages(g, n)
+        print(('\nTop ' + str(len(lst)) + ' Wikipedia pages in this category, using the'
+                                          ' basic algorithm:'
+                                          '\nNUMBER OF RELATED PAGES || PAGE NAME'))
+        pprint.pprint(lst)
+
+    # If num is two, we call and and print out top_wiki_pagerank_pages
+    elif num == 2:
+        lst = top_wiki_pagerank_pages(g, n)
+        print(('\nTop ' + str(len(lst)) + ' Wikipedia pages in this category, using the'
+                                          ' Pagerank algorithm:'
+                                          '\nPAGE IMPORTANCE SCORE || PAGE NAME'))
+        pprint.pprint(lst)
+
+    # If num is 3 we call and print out top_wiki_page_recommendations
+    else:
+        lst = top_wiki_page_recommendations(page, n, g)
+        print(('\nTop ' + str(len(lst)) + ' other page recommendations, based on similarity scores:'
+                                          '\nSIMILARITY SCORE || PAGE NAME'))
+        pprint.pprint(lst)
+
+
 def wiki_link_pages(lst: list) -> list:
     """ Takes a list of page names and similarity scores and returns a tuple with page names
     and page urls.
-    
+
     Preconditions:
     - lst != []
     """
@@ -38,7 +70,7 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
     to other pages, and the number of their connections, sorted in descending order. If there is
     less than n pages within this category, the list will return that amount instead. This is a
     more basic and straightforward ranking approach compared to top_wiki_pagerank_pages().
-    
+
     Preconditions:
     - n > 0
 
@@ -63,7 +95,7 @@ def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
     according to pagerank's numerical weighting algorithms. The list is sorted in descending order,
     where each tuple's first element is the importance score and the second is the name of the page.
     If there is less than n pages within this category, the list will return that amount instead.
-    
+
     Preconditions:
     - n > 0
     """
@@ -84,7 +116,7 @@ def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
     other nodes within the graph. Sorted in descending order, pages with a similarity score of 0
     will not be included in this list. The list may be less than size n if there are fewer
     recommendations that meet the criteria.
-    
+
     Preconditions:
     - n > 0
     - set(g.nodes) != set()
@@ -151,29 +183,19 @@ def reverse_list_sort(lst: list, n: int) -> list:
     return reversed_lst
 
 
-def visualize_rankings(cat: str, n: int) -> None:
+def visualize_rankings(g: nx.Graph, n: int) -> None:
     """ A graphical visualization that takes in a category from a user and then compares
     the top ranked pages within that category using two different ranking approaches. The
     resulting figure consists of a comparison chart and a bar graph for each ranked list.
     """
     # Ensuring that we avoid a lengthy exception block if the user enters a category that does
     # not exist
-    cond = False
-    try:
-        wiki_graph.create_digraph(cat)
-    except ValueError:
-        print('That category doesn\'t exist! Try recalling the function with another one.')
-        cond = True
-
     # Catching for user input errors
-    if cond:
-        pass
-    elif n < 0:
+    if n < 1:
         print('You can\'t ask for an empty visualization!'
               '\nTry recalling this function and asking for at least one or more top pages.')
     else:
         # Creating the networkx graph for the visualization and it's respective ranked lists
-        g = wiki_graph.create_digraph(cat)
         lst_basic = top_wiki_pages(g, n)
         lst_pagerank = top_wiki_pagerank_pages(g, n)
 
@@ -203,7 +225,7 @@ def visualize_rankings(cat: str, n: int) -> None:
                                    [{"type": "xy"}]],
                             subplot_titles=("Comparison Chart of Top Ranked Pages from Both "
                                             "Algorithms", "Top Ranked Wikipedia Pages using the"
-                                            " Basic Algorithm (Pages vs Number of Connections)",
+                                                          " Basic Algorithm (Pages vs Number of Connections)",
                                             "Top Ranked Wikipedia Pages using Pagerank's Page"
                                             " Importance Algorithm (Pages vs Page Importance"
                                             " Score)"))
@@ -213,7 +235,8 @@ def visualize_rankings(cat: str, n: int) -> None:
             go.Table(
                 header=dict(
                     values=['RANK', 'BASIC ALGORITHM: PAGE NAME', 'BASIC ALGORITHM: CONNECTION'
-                            ' SCORE', 'PAGERANK: PAGE NAME', 'PAGERANK: IMPORTANCE SCORE'],
+                                                                  ' SCORE', 'PAGERANK: PAGE NAME',
+                            'PAGERANK: IMPORTANCE SCORE'],
                     font=dict(size=10),
                     align="left"
                 ),
@@ -238,7 +261,8 @@ def visualize_rankings(cat: str, n: int) -> None:
                              marker=dict(color=[x for x in range(1, len(x_pagerank) + 1)])),
                       row=3, col=1)
 
-        fig.update_layout(title_text="Top Ranking Wikipedia Pages within Category: " + cat,
+        fig.update_layout(title_text="Top Ranking Wikipedia Pages within Category: " + g.graph[
+            'category'],
                           showlegend=False)
         fig.show()
 
