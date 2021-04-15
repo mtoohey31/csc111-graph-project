@@ -6,7 +6,8 @@ from typing import Any, Callable, Union
 import wiki_graph
 import visualize
 import algorithms
-
+import recommendations
+from typing import Union
 
 graph = None
 
@@ -14,7 +15,30 @@ graph = None
 def intro() -> None:
     """ Prints an introduction of this program for the user.
     """
-    ...
+    print("\nWhat did you want to learn about?")
+
+    # Asking the user to choose a sub-menu of their choice
+    choose({
+        "Category selection": [(intro_print, 1), intro],
+        "Graphical Visualizations": [(intro_print, 2), intro],
+        "Recommendation systems": [(intro_print, 3), intro],
+        "Main Menu": main_menu()
+    })
+
+
+def intro_print(n: int) -> None:
+    """ Function that holds the print statements for each corresponding section in the intro
+    sub-menu.
+
+    Preconditions:
+    - n in {1, 2, 3}
+    """
+    if n == 1:
+        ...
+    elif n == 2:
+        ...
+    else:
+        ...
 
 
 def main_menu() -> None:
@@ -112,7 +136,67 @@ def cat_visualize() -> None:
 
 
 def cat_recommend() -> None:
-    choose()
+    """ Allows the user to access the recommendation systems and visualizations.
+    """
+    # Assigning our variables, these variables get reassigned each time the function is called
+    global graph
+    n = list_input()
+    page = list_input(True)
+
+    # Our dictionary to list mapping our functions to their function calls
+    choose({"List of Top Ranked Wikipedia Pages (Basic)":
+                [(recommendations.print_lst, [1, graph, n]),
+                 cat_recommend],
+            "List of Top Ranked Wikipedia Pages (Pagerank Importance)":
+                [(recommendations.print_lst, [2, graph, n]),
+                 cat_recommend],
+            "List of Top Page Recommendations for " + page + ", based on Similarity Scores":
+                [(recommendations.print_lst, [3, graph, n, page]), cat_recommend],
+            "Comparison Visual of Top Ranked Pages":
+                [(recommendations.visualize_rankings, [graph, n]), cat_recommend],
+            "Chart Visual of Top  Page Recommendations for " + page + ", based on Similarity Scores":
+                [(recommendations.visualize_recommendation, [page, n, graph]), cat_recommend],
+            "Main Menu": main_menu})
+
+
+def list_input(page: bool = False) -> Union[int, str]:
+    """ Asks the user for an int input, and returns that integer.
+    """
+    global graph
+
+    # Checks for whether the return value is a string
+    if page:
+        # Asks the user to choose a valid node within our graph
+        print('\nHere is a list of all the pages within your category:')
+        print(graph.nodes)
+        n = input('\nEnter a page from this list you\'d like recommendations for'
+                  ' (Spelling counts!):')
+
+        # Loops until user chooses a node that exists in the Graph
+        while True:
+            if n in graph.nodes:
+                break
+            else:
+                print(
+                    '\nThat page is not in this category, choose one from this list and try again:')
+                print(graph.nodes)
+
+            n = input('\nPage: ')
+
+    # Else return value is an integer
+    else:
+        # Loop until user gives valid input
+        while True:
+            n = input('\nAt MOST, how many recommendations did you want to see?')
+
+            if str.isnumeric(n) and int(n) > 0:
+                n = int(n)
+                break
+            else:
+                print("\nThat isn't valid input please try again!")
+
+    # Returns valid user input
+    return n
 
 
 if __name__ == '__main__':
