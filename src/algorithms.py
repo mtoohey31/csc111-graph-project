@@ -39,25 +39,36 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     >>> isclose(sum(val for val in page_ranks[-1].values()), 1, abs_tol=0.05)
     True
     """
+    # if g is not directed, convert it into a DiGraph where edges just go both ways
     if not g.is_directed():
         graph = g.to_directed()
     else:
         graph = g
+
     all_page_ranks = []
     page_ranks = {}
     size = len(graph.nodes)
+
+    # initialize each node's score to 1/N
     for node in graph.nodes:
         page_ranks[node] = 1.0 / size
+
+    # find nodes with no out edges
     dangling_nodes = [n for n in graph.nodes if graph.out_degree[n] == 0.0]
+
     for _ in range(max_iter):
         page_ranks_last = page_ranks.copy()
         all_page_ranks.append(page_ranks_last)
         danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
+
+        # PR(P) = (1-d)/N + d(sum (PR(i))/(L(i)) for neighbors of P) + d(sum of dangling edges scores)
         for node in graph.nodes:
             neighbors = graph.predecessors(node)
             page_ranks[node] = alpha * sum(page_ranks[n] / graph.out_degree[n]
                                            for n in neighbors)
             page_ranks[node] += (1.0 - alpha) / size + danglesum / float(size)
+
+        # check for convergence
         error = sum(abs(page_ranks[n] - page_ranks_last[n]) for n in page_ranks)
         if error < len(graph.nodes) * tol:
             return all_page_ranks + [page_ranks]
