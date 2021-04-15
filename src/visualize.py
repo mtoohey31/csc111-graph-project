@@ -8,6 +8,7 @@ from plotly.graph_objs import Scatter, Figure
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+import algorithms
 
 
 def visualize_digraph(graph: nx.DiGraph, node_size: int = 20, arrows: bool = False) -> None:
@@ -91,40 +92,57 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
 
 
 def visualize(x_values: list, y_values: list, sizes: Union[list, int], labels: list,
-              graph: nx.DiGraph, pos: Any) -> None:
+              graph: nx.DiGraph, pos: Any, arrows: bool = False) -> None:
     """Generate the visualization of the given graph, with the given
     node coordinates, labels, and sizes."""
-    fig = Figure(data=[
-        Scatter(x=x_values,
-                y=y_values,
-                mode='markers',
-                name='nodes',
-                marker=dict(symbol='circle-dot',
-                            size=sizes,
-                            line=dict(width=0.5),
-                            ),
-                text=labels,
-                hovertemplate='%{text}',
-                hoverlabel={'namelength': 0}
-                )])
+    fig = Figure()
 
-    for edge in graph.edges:
-        fig.add_annotation(
-            x=pos[edge[0]][0],
-            y=pos[edge[0]][1],
-            ax=pos[edge[1]][0],
-            ay=pos[edge[1]][1],
-            xref='x',
-            yref='y',
-            axref='x',
-            ayref='y',
-            text='',
-            showarrow=True,
-            arrowhead=5,
-            arrowsize=1,
-            arrowwidth=2,
-            opacity=0.25
-        )
+    if arrows:
+        for edge in graph.edges():
+            fig.add_annotation(
+                x=pos[edge[0]][0],
+                y=pos[edge[0]][1],
+                ax=pos[edge[1]][0],
+                ay=pos[edge[1]][1],
+                xref='x',
+                yref='y',
+                axref='x',
+                ayref='y',
+                text='',
+                showarrow=True,
+                arrowhead=5,
+                arrowsize=1,
+                arrowwidth=1,
+                opacity=0.25
+            )
+    else:
+        x_edges = []
+        y_edges = []
+        for edge in graph.edges():
+            x_edges += [pos[edge[0]][0], pos[edge[1]][0], None]
+            y_edges += [pos[edge[0]][1], pos[edge[1]][1], None]
+
+        fig.add_trace(Scatter(x=x_edges,
+                              y=y_edges,
+                              mode='lines',
+                              name='edges',
+                              line=dict(width=1),
+                              opacity=0.25,
+                              hoverinfo='none'
+                              ))
+
+    fig.add_trace(Scatter(x=x_values,
+                          y=y_values,
+                          mode='markers',
+                          name='nodes',
+                          marker=dict(symbol='circle-dot',
+                                      size=sizes,
+                                      line=dict(width=0.5),
+                                      ),
+                          text=labels,
+                          hovertemplate='%{text}',
+                          hoverlabel={'namelength': 0}
+                          ))
 
     fig.update_layout(showlegend=False, title=graph.graph['category'])
     fig.update_xaxes(showgrid=False, zeroline=False, visible=False)
