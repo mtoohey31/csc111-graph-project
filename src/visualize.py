@@ -9,26 +9,18 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
-# https://www.nordtheme.com/
-NORD = ['#2E3440', '#3B4252', '#434C5E', '#4C566A', '#D8DEE9', '#E5E9F0', '#ECEFF4', '#8FBCBB',
-        '#88C0D0', '#81A1C1', '#5E81AC', '#BF616A', '#D08770', '#EBCB8B', '#A3BE8C', '#B48EAD']
 
-
-def visualize_digraph(graph: nx.DiGraph,
-                      layout: str = 'kamada_kawai_layout', node_size: int = 20) -> None:
+def visualize_digraph(graph: nx.DiGraph, node_size: int = 20, arrows: bool = False) -> None:
     """Visualize the given NetworkX DiGraph."""
-    pos = getattr(nx, layout)(graph)
+    pos = getattr(nx, 'spring_layout')(
+        graph, k=1 / (graph.number_of_nodes() ** (1/4)))
 
     x_values = [pos[k][0] for k in graph.nodes]
     y_values = [pos[k][1] for k in graph.nodes]
 
     labels = list(graph.nodes())
 
-    colours = []
-    for i in range(len(graph.nodes)):
-        colours.append(NORD[7:][i % len(NORD[7:])])
-
-    visualize(x_values, y_values, node_size, colours, labels, graph, pos)
+    visualize(x_values, y_values, node_size, labels, graph, pos, arrows)
 
 
 def visualize_histograms(graph: nx.DiGraph, bins: int = 100) -> None:
@@ -40,8 +32,10 @@ def visualize_histograms(graph: nx.DiGraph, bins: int = 100) -> None:
 
     # extract graph data
     page_names = [node[0] for node in graph.nodes(data=True)]
-    link_data = [len(node[1]['object'].links) for node in graph.nodes(data=True)]
-    backlink_data = [len(node[1]['object'].backlinks) for node in graph.nodes(data=True)]
+    link_data = [len(node[1]['object'].links)
+                 for node in graph.nodes(data=True)]
+    backlink_data = [len(node[1]['object'].backlinks)
+                     for node in graph.nodes(data=True)]
     # create dataframe
     df = pd.DataFrame()
     df['page_name'] = page_names
@@ -61,17 +55,14 @@ def visualize_histograms(graph: nx.DiGraph, bins: int = 100) -> None:
     fig.show()
 
 
-def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
-                       min_size: int = 10, max_size: int = 50, link_stats: bool = True) -> None:
+def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50,
+                       link_stats: bool = True, arrows: bool = False) -> None:
     """Visualize the given NetworkX DiGraph and its PageRank properties."""
-    pos = getattr(nx, layout)(graph)
+    pos = getattr(nx, 'spring_layout')(
+        graph, k=1 / (graph.number_of_nodes() ** (1/4)))
 
     x_values = [pos[k][0] for k in graph.nodes]
     y_values = [pos[k][1] for k in graph.nodes]
-
-    colours = []
-    for i in range(len(graph.nodes)):
-        colours.append(NORD[7:][i % len(NORD[7:])])
 
     scores = [node[1]['pagerank'] for node in graph.nodes(data=True)]
 
@@ -96,13 +87,13 @@ def visualize_pagerank(graph: nx.DiGraph, layout: str = 'spring_layout',
 
     sizes = [min_size + (size * size_modifier) for size in scores]
 
-    visualize(x_values, y_values, sizes, colours, labels, graph, pos)
+    visualize(x_values, y_values, sizes, labels, graph, pos, arrows)
 
 
-def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: list,
-              labels: list, graph: nx.DiGraph, pos: Any) -> None:
+def visualize(x_values: list, y_values: list, sizes: Union[list, int], labels: list,
+              graph: nx.DiGraph, pos: Any) -> None:
     """Generate the visualization of the given graph, with the given
-    node coordinates, labels, sizes and colours."""
+    node coordinates, labels, and sizes."""
     fig = Figure(data=[
         Scatter(x=x_values,
                 y=y_values,
@@ -110,8 +101,7 @@ def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: 
                 name='nodes',
                 marker=dict(symbol='circle-dot',
                             size=sizes,
-                            color=colours,
-                            line=dict(color=NORD[1], width=0.5),
+                            line=dict(width=0.5),
                             ),
                 text=labels,
                 hovertemplate='%{text}',
@@ -133,7 +123,6 @@ def visualize(x_values: list, y_values: list, sizes: Union[list, int], colours: 
             arrowhead=5,
             arrowsize=1,
             arrowwidth=2,
-            arrowcolor=NORD[1],
             opacity=0.25
         )
 
