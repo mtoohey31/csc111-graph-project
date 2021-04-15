@@ -37,7 +37,7 @@ def run() -> Any:
 
 
 def choice() -> int:
-    """ Helper function that checks for valid user input.
+    """ Helper function that asks for valid user input, and then returns that input.
     """
     # Set of allowable inputs
     val = {str(x) for x in range(1, 5)}
