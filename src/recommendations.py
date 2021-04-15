@@ -13,6 +13,9 @@ from plotly.subplots import make_subplots
 def wiki_link_pages(lst: list) -> list:
     """ Takes a list of page names and similarity scores and returns a tuple with page names
     and page urls.
+    
+    Preconditions:
+    - lst != []
     """
     wiki = w.Wikipedia('en')
     urls_so_far = []
@@ -35,6 +38,9 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
     to other pages, and the number of their connections, sorted in descending order. If there is
     less than n pages within this category, the list will return that amount instead. This is a
     more basic and straightforward ranking approach compared to top_wiki_pagerank_pages().
+    
+    Preconditions:
+    - n > 0
 
     >>> import wiki_graph
     >>> test_graph = wiki_graph.create_digraph('Prolog programming language family')
@@ -57,6 +63,9 @@ def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
     according to pagerank's numerical weighting algorithms. The list is sorted in descending order,
     where each tuple's first element is the importance score and the second is the name of the page.
     If there is less than n pages within this category, the list will return that amount instead.
+    
+    Preconditions:
+    - n > 0
     """
     page_links_so_far = []
     dict_pages = algorithms.calculate_pagerank(g)
@@ -75,6 +84,11 @@ def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
     other nodes within the graph. Sorted in descending order, pages with a similarity score of 0
     will not be included in this list. The list may be less than size n if there are fewer
     recommendations that meet the criteria.
+    
+    Preconditions:
+    - n > 0
+    - set(g.nodes) != set()
+    - page in g.nodes
     """
     # Turns the networkx node objects into a readable set
     pages = set(g.nodes)
@@ -95,6 +109,9 @@ def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
 def similarity_score(self: Any, other: Any, g: nx.Graph) -> float:
     """Return the similarity score between self and other. Based upon the similarity score from
     A3.
+
+    Preconditions:
+    - set(g.nodes) != set()
     """
     if len(g.adj[self]) == 0 or len(g.adj[other]) == 0:
         return 0.0
@@ -113,6 +130,10 @@ def similarity_score(self: Any, other: Any, g: nx.Graph) -> float:
 
 def reverse_list_sort(lst: list, n: int) -> list:
     """ Helper function that takes a list and returns the n greatest elements from it.
+
+    Preconditions:
+    - n > 0
+    - lst != []
     """
     # Sort the list using pythons built in sort function, and creates accumulator for the
     # reversed version of this list
@@ -131,9 +152,9 @@ def reverse_list_sort(lst: list, n: int) -> list:
 
 
 def visualize_rankings(cat: str, n: int) -> None:
-    """ A graphical visualization that takes in a category from a user and then compares 
-    the top ranked pages within that category using two different ranking approaches. The 
-    resulting figure consists of a comparison chart and a bar graph for each ranked list. 
+    """ A graphical visualization that takes in a category from a user and then compares
+    the top ranked pages within that category using two different ranking approaches. The
+    resulting figure consists of a comparison chart and a bar graph for each ranked list.
     """
     # Ensuring that we avoid a lengthy exception block if the user enters a category that does
     # not exist
@@ -223,11 +244,11 @@ def visualize_rankings(cat: str, n: int) -> None:
 
 
 def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
-    """ A chart visualization that takes in a page that exists in a networkx graph and 
-    returns a chart visual that displays at most n other wikipedia page recommendations 
+    """ A chart visualization that takes in a page that exists in a networkx graph and
+    returns a chart visual that displays at most n other wikipedia page recommendations
     in the same category the graph is based on. Recommendations are generated from
     top_wiki_page_recommendations() using a similarity score based upon the weightless
-    version from A3. 
+    version from A3.
     """
     # Error Catching
     if page not in g.nodes:
@@ -288,7 +309,7 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-    # 
+    #
     # import python_ta
     # python_ta.check_all(config={
     #     'max-line-length': 100,
