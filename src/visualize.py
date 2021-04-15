@@ -4,10 +4,7 @@ from decimal import Decimal
 from typing import Any, Union
 
 import networkx as nx
-from plotly.graph_objs import Scatter, Figure
-import plotly.express as px
-import plotly.graph_objects as go
-import pandas as pd
+from plotly.graph_objs import Scatter, Figure, Histogram
 import algorithms
 
 
@@ -24,33 +21,39 @@ def visualize_digraph(graph: nx.DiGraph, node_size: int = 20, arrows: bool = Fal
     visualize(x_values, y_values, node_size, labels, graph, pos, arrows)
 
 
-def visualize_histograms(graph: nx.DiGraph, bins: int = 100) -> None:
+def visualize_histograms(graph: nx.DiGraph, local: bool = True, bins: int = 100) -> None:
     """This function graphs histograms of the inbound and outbound links per page.
     Preconditions:
       - len(test_graph.nodes) > 0
       - bins > 0
     """
+    fig = Figure()
 
-    # extract graph data
-    page_names = [node[0] for node in graph.nodes(data=True)]
-    link_data = [len(node[1]['object'].links)
-                 for node in graph.nodes(data=True)]
-    backlink_data = [len(node[1]['object'].backlinks)
-                     for node in graph.nodes(data=True)]
-    # create dataframe
-    df = pd.DataFrame()
-    df['page_name'] = page_names
-    df['links'] = link_data
-    df['backlinks'] = backlink_data
-    # create histogram
-    fig = go.Figure()
-    fig.add_trace(go.Histogram(name='Links', x=link_data, nbinsx=bins))
-    fig.add_trace(go.Histogram(name='Backlinks', x=backlink_data, nbinsx=bins))
+    if local:
+        # extract graph data
+        local_links = [node[1]['local_links'] for node in test_graph.nodes(data=True)]
+        local_backlinks = [node[1]['local_backlinks']
+                     for node in test_graph.nodes(data=True)]
 
-    fig.update_layout(barmode='overlay', title_text="Number of links vs. backlinks per page",
-                      legend_title_text='Link Type:')
+        fig.add_trace(Histogram(name='Local Backlinks', x=local_backlinks, bingroup=1))
+        fig.add_trace(Histogram(name='Local Links', x=local_links, bingroup=1))
+
+        fig.update_layout(barmode='overlay',
+                          title_text="Number of local links vs. local backlinks per page")
+    else:
+        # extract graph data
+        links = [node[1]['links'] for node in test_graph.nodes(data=True)]
+        backlinks = [node[1]['backlinks']
+                     for node in test_graph.nodes(data=True)]
+
+        fig.add_trace(Histogram(name='Backlinks', x=backlinks, bingroup=1))
+        fig.add_trace(Histogram(name='Links', x=links, bingroup=1))
+
+        fig.update_layout(barmode='overlay', title_text="Number of links vs. backlinks per page")
+
     fig.update_xaxes(title_text='Number of Links')
     fig.update_yaxes(title_text='Number of Pages')
+
     fig.update_traces(opacity=0.75)
 
     fig.show()
@@ -178,4 +181,6 @@ if __name__ == '__main__':
     # visualize_pagerank(test_graph)
 
     # Dual Histogram test
+    algorithms.assign_link_stats(test_graph)
     visualize_histograms(test_graph)
+    # hist_two(test_graph)
