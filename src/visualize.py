@@ -31,8 +31,11 @@ def visualize_digraph(graph: nx.DiGraph,
     visualize(x_values, y_values, node_size, colours, labels, graph, pos)
 
 
-def visualize_histograms(graph: nx.DiGraph) -> None:
+def visualize_histograms(graph: nx.DiGraph, bins: int = 100) -> None:
     """This function graphs histograms of the inbound and outbound links per page.
+    Preconditions:
+      - len(test_graph.nodes) > 0
+      - bins > 0
     """
 
     # extract graph data
@@ -46,10 +49,14 @@ def visualize_histograms(graph: nx.DiGraph) -> None:
     df['backlinks'] = backlink_data
     # create histogram
     fig = go.Figure()
-    fig.add_trace(go.Histogram(x=link_data, nbinsx=100))
-    fig.add_trace(go.Histogram(x=backlink_data, nbinsx=100))
+    fig.add_trace(go.Histogram(name='Links', x=link_data, nbinsx=bins))
+    fig.add_trace(go.Histogram(name='Backlinks', x=backlink_data, nbinsx=bins))
 
-    fig.update_layout(barmode='stack')
+    fig.update_layout(barmode='overlay', title_text="Number of links vs. backlinks per page",
+                      legend_title_text='Link Type:')
+    fig.update_xaxes(title_text='Number of Links')
+    fig.update_yaxes(title_text='Number of Pages')
+    fig.update_traces(opacity=0.75)
 
     fig.show()
 
