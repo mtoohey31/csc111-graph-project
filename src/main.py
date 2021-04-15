@@ -12,35 +12,6 @@ from typing import Union
 graph = None
 
 
-def intro() -> None:
-    """ Prints an introduction of this program for the user.
-    """
-    print("\nWhat did you want to learn about?")
-
-    # Asking the user to choose a sub-menu of their choice
-    choose({
-        "Category selection": [(intro_print, 1), intro],
-        "Graphical Visualizations": [(intro_print, 2), intro],
-        "Recommendation systems": [(intro_print, 3), intro],
-        "Main Menu": main_menu()
-    })
-
-
-def intro_print(n: int) -> None:
-    """ Function that holds the print statements for each corresponding section in the intro
-    sub-menu.
-
-    Preconditions:
-    - n in {1, 2, 3}
-    """
-    if n == 1:
-        ...
-    elif n == 2:
-        ...
-    else:
-        ...
-
-
 def main_menu() -> None:
     """ The function responsible for running the entire program.
     Puts out a menu for the user and allows access to the different parts of the program.
