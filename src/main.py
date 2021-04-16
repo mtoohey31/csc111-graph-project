@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-
 """The Main python file that hosts the functionability of this program."""
 from typing import Any, Callable, Union
-
 import wiki_graph
 import visualize
 import algorithms
 import recommendations
-from typing import Union
+
 
 graph = None
 
 
 def main_menu() -> None:
-    """ The function responsible for running the entire program.
-    Puts out a menu for the user and allows access to the different parts of the program.
+    """The main menu of the program. Prints a menu for the user and allows access to the different
+    parts of the program.
     """
+    # Get the global graph variable
     global graph
 
+    # Check if a graph has been chosen
     if graph is None:
         choose({
             "Select Category": cat_select,
@@ -33,12 +33,15 @@ def main_menu() -> None:
             "Exit": exit})
 
 
-def choose(choices: dict[str, Union[Callable, None, tuple[Callable, list],
+def choose(choices: dict[str, Union[Callable, None, tuple[Callable, Any],
                                     list[Union[Callable, tuple[Callable, Any]]]]]) -> None:
     """Helper function that asks for valid user input, then calls the corresponding function,
     unless that function is None.
     """
+    # Print the first header
     print("\nSelect an Option:\n")
+
+    # Print out the options
     index = 1
     for option in choices:
         if choices[option] is not None:
@@ -58,8 +61,11 @@ def choose(choices: dict[str, Union[Callable, None, tuple[Callable, list],
         else:
             break
 
-    action = [value for value in choices.values() if value is not None][int(choice) - 1]
+    action = [value for value in choices.values(
+    ) if value is not None][int(choice) - 1]
 
+    # Parse the different combinations of data structures, calling the appropriate functions with
+    # the provided arguments
     if isinstance(action, list):
         for step in action:
             if isinstance(step, tuple):
@@ -80,31 +86,36 @@ def choose(choices: dict[str, Union[Callable, None, tuple[Callable, list],
 
 def cat_select() -> None:
     """Allow the user to select a category."""
+    # Prompt the user for input and collect that input
     print("'\nPlease select a category.\n")
-
     choice = input("Cateogry Name: ")
 
+    # Ensure the graph is created without issue before returning to the main menu.
     try:
+        # Get the global graph variable
         global graph
         graph = wiki_graph.create_digraph(choice)
-    except:
+    except ValueError:
         print(
             "This category wasn't found on Wikipedia, please"
             " ensure that you are entering the title without "
             "the cateogry prefix, ex.: \"Logic programming languages\"")
         cat_select()
 
+    # Return to the main menu
     main_menu()
 
 
 def cat_visualize() -> None:
     """Allow the user to visualize the selected category."""
+    # Get the global graph variable
     global graph
 
+    # Prompt the user to choose a visualization or return to the main menu
     choose({"Visualize Graph": [(visualize.visualize_digraph, graph), cat_visualize],
             "Visualize PageRank Graph": [(algorithms.assign_pagerank, graph),
                                          (visualize.visualize_pagerank, graph), cat_visualize],
-            "Visualize Link Histograms": [(visualize.visualize_histograms, graph)],
+            "Visualize Link Histograms": (visualize.visualize_histograms, graph),
             "Main Menu": main_menu})
 
 
@@ -118,8 +129,8 @@ def cat_recommend() -> None:
 
     # Our dictionary to list mapping our functions to their function calls
     choose({"List of Top Ranked Wikipedia Pages (Basic)":
-                [(recommendations.print_lst, [1, graph, n]),
-                 cat_recommend],
+            [(recommendations.print_lst, [1, graph, n]),
+             cat_recommend],
             "List of Top Ranked Wikipedia Pages (Pagerank Importance)":
                 [(recommendations.print_lst, [2, graph, n]),
                  cat_recommend],
@@ -127,8 +138,9 @@ def cat_recommend() -> None:
                 [(recommendations.print_lst, [3, graph, n, page]), cat_recommend],
             "Comparison Visual of Top Ranked Pages":
                 [(recommendations.visualize_rankings, [graph, n]), cat_recommend],
-            "Chart Visual of Top  Page Recommendations for " + page + ", based on Similarity Scores":
-                [(recommendations.visualize_recommendation, [page, n, graph]), cat_recommend],
+            f"Chart Visual of Top  Page Recommendations for {page}, based on Similarity Scores":
+                [(recommendations.visualize_recommendation,
+                  [page, n, graph]), cat_recommend],
             "Main Menu": main_menu})
 
 
@@ -173,7 +185,16 @@ def list_input(page: bool = False) -> Union[int, str]:
 
 
 if __name__ == '__main__':
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'max-line-length': 100,
+    #     'extra-imports': ['wiki_graph', 'visualize', 'algorithms', 'recommendations'],
+    #     'max-nested-blocks': 4
+    # })
+
+    # Print the initial welcome message
     print('\n~Comparing & Mapping Wikipedia Articles: A Simulation~')
     print('A program by: Gabe Guralnick, Matthew Toohey, Nathan Hansen & Azka Azmi')
 
+    # Start the main menu
     main_menu()

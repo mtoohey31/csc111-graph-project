@@ -1,13 +1,12 @@
 """ Recommendation and Similarity Algorithms used to analyze and return the similarities between
 pages within certain Wikipedia Categories"""
-import networkx as nx
 from typing import Any
-import algorithms
-import wikipediaapi as w
 import pprint
-
+import networkx as nx
+import wikipediaapi as wa
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import algorithms
 
 
 def print_lst(num: int, g: nx.Graph, n: int, page: str = None) -> None:
@@ -49,11 +48,11 @@ def wiki_link_pages(lst: list) -> list:
     Preconditions:
     - lst != []
     """
-    wiki = w.Wikipedia('en')
+    wiki = wa.Wikipedia('en')
     urls_so_far = []
 
     # Retrieving the URL for each page and appending it to a list tuple.
-    if type(lst[0]) is tuple:
+    if isinstance(lst[0], tuple):
         for elem in lst:
             page_py = wiki.page(elem[1])
             urls_so_far.append((elem[1], page_py.fullurl))
@@ -112,15 +111,15 @@ def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
 
 
 def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
-    """ Returns a list of n wikipage recommendations and their score of how similar they are to all
+    """Returns a list of n wikipage recommendations and their score of how similar they are to all
     other nodes within the graph. Sorted in descending order, pages with a similarity score of 0
     will not be included in this list. The list may be less than size n if there are fewer
     recommendations that meet the criteria.
 
     Preconditions:
-    - n > 0
-    - set(g.nodes) != set()
-    - page in g.nodes
+      - n > 0
+      - set(g.nodes) != set()
+      - page in g.nodes
     """
     # Turns the networkx node objects into a readable set
     pages = set(g.nodes)
@@ -139,8 +138,7 @@ def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
 
 
 def similarity_score(self: Any, other: Any, g: nx.Graph) -> float:
-    """Return the similarity score between self and other. Based upon the similarity score from
-    A3.
+    """Return the similarity score between self and other. Based upon the similarity score from A3.
 
     Preconditions:
     - set(g.nodes) != set()
@@ -164,8 +162,8 @@ def reverse_list_sort(lst: list, n: int) -> list:
     """ Helper function that takes a list and returns the n greatest elements from it.
 
     Preconditions:
-    - n > 0
-    - lst != []
+      - n > 0
+      - lst != []
     """
     # Sort the list using pythons built in sort function, and creates accumulator for the
     # reversed version of this list
@@ -184,9 +182,9 @@ def reverse_list_sort(lst: list, n: int) -> list:
 
 
 def visualize_rankings(g: nx.Graph, n: int) -> None:
-    """ A graphical visualization that takes in a category from a user and then compares
-    the top ranked pages within that category using two different ranking approaches. The
-    resulting figure consists of a comparison chart and a bar graph for each ranked list.
+    """ A graphical visualization that takes in a category from a user and then compares the top
+    ranked pages within that category using two different ranking approaches. The resulting figure
+    consists of a comparison chart and a bar graph for each ranked list.
     """
     # Ensuring that we avoid a lengthy exception block if the user enters a category that does
     # not exist
@@ -224,8 +222,8 @@ def visualize_rankings(g: nx.Graph, n: int) -> None:
                                    [{"type": "xy"}],
                                    [{"type": "xy"}]],
                             subplot_titles=("Comparison Chart of Top Ranked Pages from Both "
-                                            "Algorithms", "Top Ranked Wikipedia Pages using the"
-                                                          " Basic Algorithm (Pages vs Number of Connections)",
+                                            "Algorithms", "Top Ranked Wikipedia Pages using the" +
+                                            " Basic Algorithm (Pages vs Number of Connections)",
                                             "Top Ranked Wikipedia Pages using Pagerank's Page"
                                             " Importance Algorithm (Pages vs Page Importance"
                                             " Score)"))
@@ -242,7 +240,7 @@ def visualize_rankings(g: nx.Graph, n: int) -> None:
                 ),
                 cells=dict(
                     values=[
-                        [x for x in range(1, n + 1)],
+                        list(range(1, n + 1)),
                         x_basic,
                         y_basic,
                         x_pagerank,
@@ -254,25 +252,23 @@ def visualize_rankings(g: nx.Graph, n: int) -> None:
         )
         # Creating our first Bar Graph Figure
         fig.add_trace(go.Bar(x=x_basic, y=y_basic,
-                             marker=dict(color=[x for x in range(1, len(x_basic) + 1)])),
+                             marker=dict(color=list(range(1, len(x_basic) + 1)))),
                       row=2, col=1)
         # Creating our second Bar Graph Figure
         fig.add_trace(go.Bar(x=x_pagerank, y=y_pagerank,
-                             marker=dict(color=[x for x in range(1, len(x_pagerank) + 1)])),
+                             marker=dict(color=list(range(1, len(x_pagerank) + 1)))),
                       row=3, col=1)
 
         fig.update_layout(title_text="Top Ranking Wikipedia Pages within Category: " + g.graph[
-            'category'],
-                          showlegend=False)
+            'category'], showlegend=False)
         fig.show()
 
 
 def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
-    """ A chart visualization that takes in a page that exists in a networkx graph and
-    returns a chart visual that displays at most n other wikipedia page recommendations
-    in the same category the graph is based on. Recommendations are generated from
-    top_wiki_page_recommendations() using a similarity score based upon the weightless
-    version from A3.
+    """A chart visualization that takes in a page that exists in a networkx graph and returns a
+    chart visual that displays at most n other wikipedia page recommendations in the same category
+    the graph is based on. Recommendations are generated from top_wiki_page_recommendations() using
+    a similarity score based upon the weightless version from A3.
     """
     # Error Catching
     if page not in g.nodes:
@@ -318,12 +314,12 @@ def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
                 # 2-D list of colors for alternating rows
                 fill_color=[[row_odd_color, row_even_color] * n],
                 align=['left', 'center'],
-                font=dict(color='darkslategray', size=11)
-            ))
-        ])
+                font=dict(color='darkslategray', size=11))
+        )])
+
         fig.update_layout(
-            title_text='<b>Based on your interest in<b> \"' + page + '\", <b>here\'s<b> '
-                       + str(n) + ' <b>other Wikipages we recommend you visit.<b>'
+            title_text='<b>Based on your interest in<b> \"' + page + '\", <b>here\'s<b> ' +
+            str(n) + ' <b>other Wikipages we recommend you visit.<b>'
         )
 
         fig.show()
@@ -331,24 +327,13 @@ def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
 
 if __name__ == '__main__':
     import doctest
-
     doctest.testmod()
-    #
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 100,
-    #     'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
-    #     'max-nested-blocks': 4
-    # })
 
-    # import wiki_graph
-
-    # test_graph = wiki_graph.create_digraph(
-    #     'Procedural programming languages')
-
-    # test = top_wiki_pages(test_graph, 25)
-    # test2 = top_wiki_pagerank_pages(test_graph, 25)
-    # top_wiki_page_recommendations(test[0][1], 15, test_graph)
-
-    # visualize_recommendation(test[0][1], 100, test_graph)
-    # visualize_rankings('Procedural programming languages', 100)
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 100,
+        'extra-imports': ['networkx', 'pprint', 'plotly.graph_objects', 'plotly.subplots',
+                          'algorithms', 'wikipediaapi'],
+        'max-nested-blocks': 4,
+        'allowed-io': ['print_lst', 'visualize_rankings', 'visualize_recommendation']
+    })

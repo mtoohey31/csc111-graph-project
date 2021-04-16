@@ -1,14 +1,10 @@
 """Algorithms for analyzing NetworkX DiGraphs based on Wikipedia articles."""
-from typing import List
-
 import networkx as nx
-import wikipediaapi as wa
 
 
-def calculate_pagerank(graph: nx.Graph) -> dict:
-    """Use the NetworkX PageRank implementation to
-    calculate the PageRanks for all nodes in the graph.
-    Returns a dictionary of nodes with PageRanks as values.
+def calculate_pagerank(graph: nx.DiGraph) -> dict:
+    """Use the NetworkX PageRank implementation to calculate the PageRanks for all nodes in the
+    graph. Returns a dictionary of nodes with PageRanks as values.
 
     >>> import wiki_graph
     >>> g = wiki_graph.create_digraph('Logic programming languages')
@@ -20,13 +16,13 @@ def calculate_pagerank(graph: nx.Graph) -> dict:
     return nx.algorithms.link_analysis.pagerank(graph)
 
 
+# TODO: Change type annotation to DiGraph and remove to_directed if statement
 def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
-                              max_iter: int = 100, tol=1.0e-6) -> List[dict]:
-    """A manual implementation of the PageRank algorithm.
-    Calculates the PageRanks for all nodes in the graph, and returns
-    a dictionary of nodes with PageRanks as values.
-    Uses the iterative computation method from https://en.wikipedia.org/wiki/PageRank.
-    Note that the results of this algorithm differ slightly from the NetworkX implementation.
+                              max_iter: int = 100, tol: float = 1.0e-6) -> list[dict]:
+    """A manual implementation of the PageRank algorithm. Calculates the PageRanks for all nodes in
+    the graph, and returns a dictionary of nodes with PageRanks as values. Uses the iterative
+    computation method from https://en.wikipedia.org/wiki/PageRank. Note that the results of this
+    algorithm differ slightly from the NetworkX implementation.
 
     Preconditions:
         - 0 <= alpha <= 1
@@ -61,7 +57,7 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
         all_page_ranks.append(page_ranks_last)
         danglesum = alpha * sum(page_ranks[n] for n in dangling_nodes)
 
-        # PR(P) = (1-d)/N + d(sum (PR(i))/(L(i)) for neighbors of P) + d(sum of dangling edges scores)
+        # PR(P) = (1-d)/N + d(sum(PR(i))/(L(i)) for neighbors of P) + d(sum of dangling edge scores)
         for node in graph.nodes:
             neighbors = graph.predecessors(node)
             page_ranks[node] = alpha * sum(page_ranks[n] / graph.out_degree[n]
@@ -69,15 +65,17 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
             page_ranks[node] += (1.0 - alpha) / size + danglesum / float(size)
 
         # check for convergence
-        error = sum(abs(page_ranks[n] - page_ranks_last[n]) for n in page_ranks)
+        error = sum(abs(page_ranks[n] - page_ranks_last[n])
+                    for n in page_ranks)
         if error < len(graph.nodes) * tol:
             return all_page_ranks + [page_ranks]
-    raise ValueError(f'pagerank calculation failed to converge in {max_iter} iterations')
+    raise ValueError(
+        f'pagerank calculation failed to converge in {max_iter} iterations')
 
 
+# TODO: Change type annotation to DiGraph
 def assign_pagerank(graph: nx.Graph, manual: bool = False) -> None:
-    """Calculate and assign PageRank values to the graph
-    as node attributes.
+    """Calculate and assign PageRank values to the graph as node attributes.
 
     >>> import wiki_graph
     >>> g = wiki_graph.create_digraph('Logic programming languages')
@@ -86,56 +84,47 @@ def assign_pagerank(graph: nx.Graph, manual: bool = False) -> None:
     >>> isclose(sum(node[1]['pagerank'] for node in g.nodes(data=True)), 1)
     True
     """
-    # Calculate PageRanks for the nodes, and assign them as node attributes
+    # Calculate PageRanks for the nodes
     if manual:
+        # If using the manual function, use the final set of values
         page_ranks = calculate_pagerank_manual(graph)[-1]
     else:
         page_ranks = calculate_pagerank(graph)
+    # Assign the values as node attributes
     for node in graph.nodes():
         graph.nodes[node]["pagerank"] = page_ranks[node]
 
 
-def assign_link_stats(graph: nx.Graph) -> None:
-    """Calculate link statistics the given graph and assign them as node attributes."""
-    category = graph.graph['category']
+def assign_link_stats(graph: nx.DiGraph) -> None:
+    """Calculate link statistics for the given graph and assign them as node attributes.
 
-    wiki = wa.Wikipedia('en')
-    cat = wiki.page(f'Category:{category}')
-
+    >>> import wiki_graph
+    >>> g = wiki_graph.create_digraph('Prolog programming language family')
+    >>> assign_link_stats(g)
+    >>> node = list(g.nodes(data=True))[0][1]
+    >>> node['links']
+    12
+    >>> node['backlinks']
+    4
+    >>> node['local_links']
+    1
+    >>> node['local_backlinks']
+    0
+    """
     for node in graph.nodes:
         node_object = graph.nodes[node]['object']
-        graph.add_node(node, local_links=len(
-            set(node_object.links).intersection(set(cat.categorymembers))))
-        graph.add_node(node, local_backlinks=len(
-            set(node_object.backlinks).intersection(set(cat.categorymembers))))
-        graph.add_node(node, links=len(node_object.links))
-        graph.add_node(node, backlinks=len(node_object.backlinks))
+        graph.add_node(node, local_links=len(graph.out_edges(node)),
+                       local_backlinks=len(graph.in_edges(node)), links=len(node_object.links),
+                       backlinks=len(node_object.backlinks))
 
 
 if __name__ == '__main__':
     import doctest
-
     doctest.testmod()
 
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 100,
-    #     'extra-imports': ['networkx', 'graph', 'wikipediaapi'],
-    #     'max-nested-blocks': 4
-    # })
-
-    import wiki_graph
-
-    # test_graph = wiki_graph.create_digraph(
-    #     'Procedural programming languages')  # Large Test
-    test_graph = wiki_graph.create_digraph(
-        'Prolog programming language family')  # Small Test
-
-    # PageRank test
-    assign_pagerank(test_graph)
-    print(test_graph.nodes(data=True))
-    print(calculate_pagerank_manual(test_graph))
-
-    # Stats test
-    # assign_link_stats(test_graph)
-    # print(test_graph.nodes(data=True))
+    import python_ta
+    python_ta.check_all(config={
+        'max-line-length': 100,
+        'extra-imports': ['networkx', 'wiki_graph'],
+        'max-nested-blocks': 4
+    })
