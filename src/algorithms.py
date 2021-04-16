@@ -16,9 +16,8 @@ def calculate_pagerank(graph: nx.DiGraph) -> dict:
     return nx.algorithms.link_analysis.pagerank(graph)
 
 
-# TODO: Change type annotation to DiGraph and remove to_directed if statement
-def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
-                              max_iter: int = 100, tol: float = 1.0e-6) -> list[dict]:
+def calculate_pagerank_manual(graph: nx.DiGraph, alpha: float = 0.85, max_iter: int = 100,
+                              tol: float = 1.0e-6) -> list[dict]:
     """A manual implementation of the PageRank algorithm. Calculates the PageRanks for all nodes in
     the graph, and returns a dictionary of nodes with PageRanks as values. Uses the iterative
     computation method from https://en.wikipedia.org/wiki/PageRank. Note that the results of this
@@ -35,12 +34,6 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
     >>> isclose(sum(val for val in page_ranks[-1].values()), 1, abs_tol=0.05)
     True
     """
-    # if g is not directed, convert it into a DiGraph where edges just go both ways
-    if not g.is_directed():
-        graph = g.to_directed()
-    else:
-        graph = g
-
     all_page_ranks = []
     page_ranks = {}
     size = len(graph.nodes)
@@ -73,8 +66,7 @@ def calculate_pagerank_manual(g: nx.Graph, alpha: float = 0.85,
         f'pagerank calculation failed to converge in {max_iter} iterations')
 
 
-# TODO: Change type annotation to DiGraph
-def assign_pagerank(graph: nx.Graph, manual: bool = False) -> None:
+def assign_pagerank(graph: nx.DiGraph, manual: bool = False) -> None:
     """Calculate and assign PageRank values to the graph as node attributes.
 
     >>> import wiki_graph

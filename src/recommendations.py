@@ -9,7 +9,7 @@ from plotly.subplots import make_subplots
 import algorithms
 
 
-def print_lst(num: int, g: nx.Graph, n: int, page: str = None) -> None:
+def print_lst(num: int, g: nx.DiGraph, n: int, page: str = None) -> None:
     """ Function used for main.py. The parameter n is either a one, two or three,
     which will call and print the resulting list of its corresponding ranking function.
 
@@ -64,7 +64,7 @@ def wiki_link_pages(lst: list) -> list:
     return urls_so_far
 
 
-def top_wiki_pages(g: nx.Graph, n: int) -> list:
+def top_wiki_pages(g: nx.DiGraph, n: int) -> list:
     """ Returns a list of size n wiki pages within this category that hold the most connections
     to other pages, and the number of their connections, sorted in descending order. If there is
     less than n pages within this category, the list will return that amount instead. This is a
@@ -89,7 +89,7 @@ def top_wiki_pages(g: nx.Graph, n: int) -> list:
     return reverse_list_sort(page_links_so_far, n)
 
 
-def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
+def top_wiki_pagerank_pages(g: nx.DiGraph, n: int) -> list:
     """Returns a list of size n of wiki pages within this category that hold the most importance,
     according to pagerank's numerical weighting algorithms. The list is sorted in descending order,
     where each tuple's first element is the importance score and the second is the name of the page.
@@ -110,7 +110,7 @@ def top_wiki_pagerank_pages(g: nx.Graph, n: int) -> list:
     return reverse_list_sort(page_links_so_far, n)
 
 
-def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
+def top_wiki_page_recommendations(page: str, n: int, g: nx.DiGraph) -> list:
     """Returns a list of n wikipage recommendations and their score of how similar they are to all
     other nodes within the graph. Sorted in descending order, pages with a similarity score of 0
     will not be included in this list. The list may be less than size n if there are fewer
@@ -137,7 +137,7 @@ def top_wiki_page_recommendations(page: str, n: int, g: nx.Graph) -> list:
     return reverse_list_sort(scores_so_far, n)
 
 
-def similarity_score(self: Any, other: Any, g: nx.Graph) -> float:
+def similarity_score(self: Any, other: Any, g: nx.DiGraph) -> float:
     """Return the similarity score between self and other. Based upon the similarity score from A3.
 
     Preconditions:
@@ -181,7 +181,7 @@ def reverse_list_sort(lst: list, n: int) -> list:
     return reversed_lst
 
 
-def visualize_rankings(g: nx.Graph, n: int) -> None:
+def visualize_rankings(g: nx.DiGraph, n: int) -> None:
     """ A graphical visualization that takes in a category from a user and then compares the top
     ranked pages within that category using two different ranking approaches. The resulting figure
     consists of a comparison chart and a bar graph for each ranked list.
@@ -264,7 +264,7 @@ def visualize_rankings(g: nx.Graph, n: int) -> None:
         fig.show()
 
 
-def visualize_recommendation(page: str, n: int, g: nx.Graph) -> None:
+def visualize_recommendation(page: str, n: int, g: nx.DiGraph) -> None:
     """A chart visualization that takes in a page that exists in a networkx graph and returns a
     chart visual that displays at most n other wikipedia page recommendations in the same category
     the graph is based on. Recommendations are generated from top_wiki_page_recommendations() using
