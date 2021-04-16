@@ -14,20 +14,6 @@ This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, a
 import networkx as nx
 
 
-def calculate_pagerank(graph: nx.DiGraph) -> dict:
-    """Use the NetworkX PageRank implementation to calculate the PageRanks for all nodes in the
-    graph. Returns a dictionary of nodes with PageRanks as values.
-
-    >>> import wiki_graph
-    >>> g = wiki_graph.create_digraph('Logic programming languages')
-    >>> from math import isclose
-    >>> page_ranks = calculate_pagerank(g)
-    >>> isclose(sum(val for val in page_ranks.values()), 1)
-    True
-    """
-    return nx.algorithms.link_analysis.pagerank(graph)
-
-
 def calculate_pagerank_manual(graph: nx.DiGraph, alpha: float = 0.85, max_iter: int = 100,
                               tol: float = 1.0e-6) -> list[dict]:
     """A manual implementation of the PageRank algorithm. Calculates the PageRanks for all nodes in
@@ -76,6 +62,20 @@ def calculate_pagerank_manual(graph: nx.DiGraph, alpha: float = 0.85, max_iter: 
             return all_page_ranks + [page_ranks]
     raise ValueError(
         f'pagerank calculation failed to converge in {max_iter} iterations')
+
+
+def calculate_pagerank(graph: nx.DiGraph) -> dict:
+    """Use the NetworkX PageRank implementation to calculate the PageRanks for all nodes in the
+    graph. Returns a dictionary of nodes with PageRanks as values.
+
+    >>> import wiki_graph
+    >>> g = wiki_graph.create_digraph('Logic programming languages')
+    >>> from math import isclose
+    >>> page_ranks = calculate_pagerank(g)
+    >>> isclose(sum(val for val in page_ranks.values()), 1)
+    True
+    """
+    return nx.algorithms.link_analysis.pagerank(graph)
 
 
 def assign_pagerank(graph: nx.DiGraph, manual: bool = False) -> None:
