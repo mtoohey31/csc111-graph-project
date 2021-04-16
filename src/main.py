@@ -1,43 +1,38 @@
 #!/usr/bin/env python3
 """The Main python file that hosts the functionability of this program."""
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Optional
+import networkx as nx
 import wiki_graph
 import visualize
 import algorithms
 import recommendations
 
 
-# We're using a global variable for the graph because otherwise we have to recursively pass it
-# between every other method in this file, which creates unnecessary complexity.
-graph = None
-
-
-def main_menu() -> None:
+def main_menu(graph: Optional[nx.DiGraph] = None) -> None:
     """The main menu of the program. Prints a menu for the user and allows access to the different
     parts of the program.
     """
-    # Get the global graph variable
-    global graph
-
     # Check if a graph has been chosen
     if graph is None:
         choose({
-            "Select Category": cat_select,
+            "Select Category": (cat_select, graph),
             "Category Visualizations (Please select a category first)": None,
             "Category Recommendations (Please select a category first)": None,
-            "Exit": exit})
+            "Exit": exit}, graph)
 
     else:
         choose({
-            f"Select Category (Currently selected \"{graph.graph['category']}\")": cat_select,
-            "Category Visualizations": cat_visualize,
-            "Category Recommendations": cat_recommend,
-            "Exit": exit})
+            f"Select Category (Currently selected \"{graph.graph['category']}\")": (cat_select,
+                                                                                    graph),
+            "Category Visualizations": (cat_visualize, graph),
+            "Category Recommendations": (cat_recommend, graph),
+            "Exit": exit}, graph)
 
 
 def choose(choices: dict[str, Union[None, Callable[[], Any], tuple[Callable[..., Any], Any],
                                     list[Union[Callable[[], Any],
-                                               tuple[Callable[..., Any], Any]]]]]) -> None:
+                                               tuple[Callable[..., Any], Any]]]]],
+           graph: Optional[nx.DiGraph] = None) -> None:
     """Helper function that asks for valid user input, then calls the corresponding function,
     unless that function is None.
     """
@@ -86,78 +81,74 @@ def choose(choices: dict[str, Union[None, Callable[[], Any], tuple[Callable[...,
         action()
 
 
-def cat_select() -> None:
+def cat_select(graph: Optional[nx.DiGraph] = None) -> None:
     """Allow the user to select a category."""
     # Prompt the user for input and collect that input
-    print("'\nPlease select a category.\n")
+    print("\nPlease select a category.\n")
     choice = input("Cateogry Name: ")
 
     # Ensure the graph is created without issue before returning to the main menu.
     try:
         # Get the global graph variable
-        global graph
         graph = wiki_graph.create_digraph(choice)
     except ValueError:
         print(
             "This category wasn't found on Wikipedia, please"
             " ensure that you are entering the title without "
             "the cateogry prefix, ex.: \"Logic programming languages\"")
-        cat_select()
+        cat_select(graph)
 
     # Return to the main menu
-    main_menu()
+    main_menu(graph)
 
 
-def cat_visualize() -> None:
+def cat_visualize(graph: Optional[nx.DiGraph] = None) -> None:
     """Allow the user to visualize the selected category."""
-    # Get the global graph variable
-    global graph
-
     # Prompt the user to choose a visualization or return to the main menu
-    choose({"Visualize Graph": [(visualize.visualize_digraph, graph), cat_visualize],
+    choose({"Visualize Graph": [(visualize.visualize_digraph, graph), (cat_visualize, graph)],
             "Visualize PageRank Graph": [(algorithms.assign_pagerank, graph),
-                                         (visualize.visualize_pagerank, graph), cat_visualize],
-            "Visualize Link Histograms": (visualize.visualize_histograms, graph),
-            "Main Menu": main_menu})
+                                         (visualize.visualize_pagerank, graph),
+                                         (cat_visualize, graph)],
+            "Visualize Link Histograms": [(algorithms.assign_link_stats, graph),
+                                          (visualize.visualize_histograms, graph),
+                                          (cat_visualize, graph)],
+            "Main Menu": (main_menu, graph)})
 
 
-def cat_recommend() -> None:
+def cat_recommend(graph: Optional[nx.DiGraph] = None) -> None:
     """ Allows the user to access the recommendation systems and visualizations.
     """
     # Assigning our variables, these variables get reassigned each time the function is called
-    global graph
-    n = list_input()
-    page = list_input(True)
+    n = list_input(graph)
+    page = list_input(graph, True)
 
     # Our dictionary to list mapping our functions to their function calls
     choose({"List of Top Ranked Wikipedia Pages (Basic)":
             [(recommendations.print_lst, [1, graph, n]),
-             cat_recommend],
+             (cat_recommend, graph)],
             "List of Top Ranked Wikipedia Pages (Pagerank Importance)":
                 [(recommendations.print_lst, [2, graph, n]),
-                 cat_recommend],
+                 (cat_recommend, graph)],
             "List of Top Page Recommendations for " + page + ", based on Similarity Scores":
-                [(recommendations.print_lst, [3, graph, n, page]), cat_recommend],
+                [(recommendations.print_lst, [3, graph, n, page]), (cat_recommend, graph)],
             "Comparison Visual of Top Ranked Pages":
-                [(recommendations.visualize_rankings, [graph, n]), cat_recommend],
+                [(recommendations.visualize_rankings, [graph, n]), (cat_recommend, graph)],
             f"Chart Visual of Top  Page Recommendations for {page}, based on Similarity Scores":
                 [(recommendations.visualize_recommendation,
-                  [page, n, graph]), cat_recommend],
-            "Main Menu": main_menu})
+                  [page, n, graph]), (cat_recommend, graph)],
+            "Main Menu": (main_menu, graph)})
 
 
-def list_input(page: bool = False) -> Union[int, str]:
+def list_input(graph: Optional[nx.DiGraph] = None, page: bool = False) -> Union[int, str]:
     """ Asks the user for an int input, and returns that integer.
     """
-    global graph
-
     # Checks for whether the return value is a string
     if page:
         # Asks the user to choose a valid node within our graph
         print('\nHere is a list of all the pages within your category:')
         print(graph.nodes)
         n = input('\nEnter a page from this list you\'d like recommendations for'
-                  ' (Spelling counts!):')
+                  ' (Spelling counts!): ')
 
         # Loops until user chooses a node that exists in the Graph
         while True:

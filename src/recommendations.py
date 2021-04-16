@@ -319,7 +319,7 @@ def visualize_recommendation(page: str, n: int, g: nx.DiGraph) -> None:
 
         fig.update_layout(
             title_text='<b>Based on your interest in<b> \"' + page + '\", <b>here\'s<b> '
-            f'{n}<b>other Wikipages we recommend you visit.<b>'
+            f'{n}<b> other Wikipages we recommend you visit.<b>'
         )
 
         fig.show()
