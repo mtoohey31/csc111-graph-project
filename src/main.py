@@ -20,7 +20,6 @@ def main_menu() -> None:
 
     if graph is None:
         choose({
-            "Introduction to the Program": intro,
             "Select Category": cat_select,
             "Category Visualizations (Please select a category first)": None,
             "Category Recommendations (Please select a category first)": None,
