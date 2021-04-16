@@ -92,6 +92,7 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
     Preconditions:
       - min_aize > 0
       - max_size > min_size
+      - algorithms.assign_pagerank has been called on graph
     """
     # Create a list of partitions using a spring layout
     if graph.number_of_nodes() != 0:
