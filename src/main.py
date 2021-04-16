@@ -61,8 +61,7 @@ def choose(choices: dict[str, Union[Callable, None, tuple[Callable, Any],
         else:
             break
 
-    action = [value for value in choices.values(
-    ) if value is not None][int(choice) - 1]
+    action = [value for value in choices.values() if value is not None][int(choice) - 1]
 
     # Parse the different combinations of data structures, calling the appropriate functions with
     # the provided arguments
@@ -189,7 +188,9 @@ if __name__ == '__main__':
     # python_ta.check_all(config={
     #     'max-line-length': 100,
     #     'extra-imports': ['wiki_graph', 'visualize', 'algorithms', 'recommendations'],
-    #     'max-nested-blocks': 4
+    #     'max-nested-blocks': 4,
+    #     'allowed-io': ['main_menu', 'choose', 'cat_select', 'cat_visualize', 'cat_recommend',
+    #                    'list_input']
     # })
 
     # Print the initial welcome message

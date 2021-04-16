@@ -96,8 +96,8 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
             local_backlinks = node[1]['local_backlinks']
             links = node[1]['links']
             backlinks = node[1]['backlinks']
-            labels.append(f'{title} - Score: {sci_score}, Local Links: {local_links},' +
-                          f' Local Backlinks: {local_backlinks}, Links: {links},' +
+            labels.append(f'{title} - Score: {sci_score}, Local Links: {local_links},'
+                          f' Local Backlinks: {local_backlinks}, Links: {links},'
                           f' Backlinks: {backlinks}')
     else:
         labels = list(graph.nodes())

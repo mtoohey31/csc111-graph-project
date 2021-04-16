@@ -222,7 +222,7 @@ def visualize_rankings(g: nx.DiGraph, n: int) -> None:
                                    [{"type": "xy"}],
                                    [{"type": "xy"}]],
                             subplot_titles=("Comparison Chart of Top Ranked Pages from Both "
-                                            "Algorithms", "Top Ranked Wikipedia Pages using the" +
+                                            "Algorithms", "Top Ranked Wikipedia Pages using the"
                                             " Basic Algorithm (Pages vs Number of Connections)",
                                             "Top Ranked Wikipedia Pages using Pagerank's Page"
                                             " Importance Algorithm (Pages vs Page Importance"
@@ -318,8 +318,8 @@ def visualize_recommendation(page: str, n: int, g: nx.DiGraph) -> None:
         )])
 
         fig.update_layout(
-            title_text='<b>Based on your interest in<b> \"' + page + '\", <b>here\'s<b> ' +
-            str(n) + ' <b>other Wikipages we recommend you visit.<b>'
+            title_text='<b>Based on your interest in<b> \"' + page + '\", <b>here\'s<b> '
+            f'{n}<b>other Wikipages we recommend you visit.<b>'
         )
 
         fig.show()
