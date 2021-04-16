@@ -18,14 +18,16 @@ from plotly.graph_objs import Scatter, Figure, Histogram
 import algorithms
 
 
-def visualize(x_values: list, y_values: list, sizes: Union[list, int], labels: list,
-              graph: nx.DiGraph, pos: Any, arrows: bool = False) -> None:
+def visualize(values: tuple[list, list, Any], sizes: Union[list, int], labels: list,
+              graph: nx.DiGraph, arrows: bool = False) -> None:
     """Generate the visualization of the given graph, with the given node coordinates, labels, and
     sizes.
 
     Preconditions:
       - all(size > 0 for size in sizes)
     """
+    x_values, y_values, pos = values
+
     fig = Figure()
 
     if arrows:
@@ -100,42 +102,37 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
     else:
         pos = nx.spring_layout(graph)
 
-    # Create a list of x values based on the positions
-    x_values = [pos[k][0] for k in graph.nodes]
-    y_values = [pos[k][1] for k in graph.nodes]
-
-    # Create a list of pagerank scores
-    scores = [node[1]['pagerank'] for node in graph.nodes(data=True)]
-
     # If link_stats, create labels using the link stats method, otherwise, use titles
     if link_stats:
         algorithms.assign_link_stats(graph)
         labels = []
 
         for node in graph.nodes(data=True):
-            title = node[0]
             sci_score = '%.2E' % Decimal(node[1]['pagerank'])
             local_links = node[1]['local_links']
             local_backlinks = node[1]['local_backlinks']
             links = node[1]['links']
             backlinks = node[1]['backlinks']
-            labels.append(f'{title} - Score: {sci_score}, Local Links: {local_links},'
+            labels.append(f'{node[0]} - Score: {sci_score}, Local Links: {local_links},'
                           f' Local Backlinks: {local_backlinks}, Links: {links},'
                           f' Backlinks: {backlinks}')
     else:
         labels = list(graph.nodes())
 
     if graph.number_of_nodes() != 0:
+        sizes = [node[1]['pagerank'] for node in graph.nodes(data=True)]
+
         # Calculate a modifier to scale the scores by
-        size_modifier = (max_size - min_size) / (max(scores) - min(scores))
+        size_modifier = (max_size - min_size) / (max(sizes) - min(sizes))
 
         # Create a list of sizes for each node using the size modifier and specified size variables
-        sizes = [min_size + (size * size_modifier) for size in scores]
+        sizes = [min_size + (size * size_modifier) for size in sizes]
     else:
         sizes = []
 
     # Use the created variables to call the main visualize function
-    visualize(x_values, y_values, sizes, labels, graph, pos, arrows)
+    visualize(([pos[k][0] for k in graph.nodes], [pos[k][1] for k in graph.nodes], pos),
+              sizes, labels, graph, arrows)
 
 
 def visualize_digraph(graph: nx.DiGraph, node_size: int = 20, arrows: bool = False) -> None:
@@ -158,7 +155,7 @@ def visualize_digraph(graph: nx.DiGraph, node_size: int = 20, arrows: bool = Fal
     labels = list(graph.nodes())
 
     # Use the created variables to call the main visualize function
-    visualize(x_values, y_values, node_size, labels, graph, pos, arrows)
+    visualize((x_values, y_values, pos), node_size, labels, graph, arrows)
 
 
 def visualize_histograms(graph: nx.DiGraph, local: bool = True) -> None:
