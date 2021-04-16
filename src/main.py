@@ -1,5 +1,15 @@
-#!/usr/bin/env python3
-"""The Main python file that hosts the functionability of this program."""
+"""CSC111 Winter 2021: Project Phase 2
+
+Module Description
+==================
+This is the main module, which hosts the functionality of the program.
+
+Copyright and Usage Information
+===============================
+The usage of this program should follow the GNU General Public License.
+
+This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, and Azka Azmi.
+"""
 from typing import Any, Callable, Union, Optional
 import networkx as nx
 import wiki_graph

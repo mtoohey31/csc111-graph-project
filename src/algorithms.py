@@ -1,4 +1,16 @@
-"""Algorithms for analyzing NetworkX DiGraphs based on Wikipedia articles."""
+"""CSC111 Winter 2021: Project Phase 2
+
+Module Description
+==================
+This module contains algorithms for analyzing NetworkX DiGraphs which were generated from
+Wikipedia articles.
+
+Copyright and Usage Information
+===============================
+The usage of this program should follow the GNU General Public License.
+
+This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, and Azka Azmi.
+"""
 import networkx as nx
 
 

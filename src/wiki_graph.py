@@ -1,4 +1,15 @@
-"""Module for creating NetworkX graphs given a Wikipedia cateogry title."""
+"""CSC111 Winter 2021: Project Phase 2
+
+Module Description
+==================
+This module is for creating NetworkX graphs given a Wikipedia category title.
+
+Copyright and Usage Information
+===============================
+The usage of this program should follow the GNU General Public License.
+
+This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, and Azka Azmi.
+"""
 import networkx as nx
 import wikipediaapi as wa
 

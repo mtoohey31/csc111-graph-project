@@ -1,4 +1,16 @@
-"""A module to visualize NetworkX graphs in Plotly."""
+"""CSC111 Winter 2021: Project Phase 2
+
+Module Description
+==================
+This module uses Plotly and Networkx to generate visualizations of the graphs and data
+computed in the other modules.
+
+Copyright and Usage Information
+===============================
+The usage of this program should follow the GNU General Public License.
+
+This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, and Azka Azmi.
+"""
 from decimal import Decimal
 from typing import Any, Union
 import networkx as nx
