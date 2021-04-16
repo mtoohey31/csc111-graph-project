@@ -41,8 +41,7 @@ def main_menu(graph: Optional[nx.DiGraph] = None) -> None:
 
 def choose(choices: dict[str, Union[None, Callable[[], Any], tuple[Callable[..., Any], Any],
                                     list[Union[Callable[[], Any],
-                                               tuple[Callable[..., Any], Any]]]]],
-           graph: Optional[nx.DiGraph] = None) -> None:
+                                               tuple[Callable[..., Any], Any]]]]]) -> None:
     """Helper function that asks for valid user input, then calls the corresponding function,
     unless that function is None.
     """
@@ -191,7 +190,7 @@ if __name__ == '__main__':
     # import python_ta
     # python_ta.check_all(config={
     #     'max-line-length': 100,
-    #     'extra-imports': ['wiki_graph', 'visualize', 'algorithms', 'recommendations'],
+    #     'extra-imports': ['wiki_graph', 'visualize', 'algorithms', 'recommendations', 'networkx'],
     #     'max-nested-blocks': 4,
     #     'allowed-io': ['main_menu', 'choose', 'cat_select', 'cat_visualize', 'cat_recommend',
     #                    'list_input']
