@@ -7,6 +7,8 @@ import algorithms
 import recommendations
 
 
+# We're using a global variable for the graph because otherwise we have to recursively pass it
+# between every other method in this file, which creates unnecessary complexity.
 graph = None
 
 
@@ -33,8 +35,9 @@ def main_menu() -> None:
             "Exit": exit})
 
 
-def choose(choices: dict[str, Union[Callable, None, tuple[Callable, Any],
-                                    list[Union[Callable, tuple[Callable, Any]]]]]) -> None:
+def choose(choices: dict[str, Union[None, Callable[[], Any], tuple[Callable[..., Any], Any],
+                                    list[Union[Callable[[], Any],
+                                               tuple[Callable[..., Any], Any]]]]]) -> None:
     """Helper function that asks for valid user input, then calls the corresponding function,
     unless that function is None.
     """
