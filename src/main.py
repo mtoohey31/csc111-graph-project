@@ -27,7 +27,6 @@ def main_menu() -> None:
 
     else:
         choose({
-            "Introduction to the Program": intro,
             f"Select Category (Currently selected \"{graph.graph['category']}\")": cat_select,
             "Category Visualizations": cat_visualize,
             "Category Recommendations": cat_recommend,
@@ -36,7 +35,8 @@ def main_menu() -> None:
 
 def choose(choices: dict[str, Union[Callable, None, tuple[Callable, list],
                                     list[Union[Callable, tuple[Callable, Any]]]]]) -> None:
-    """Helper function that asks for valid user input, then calls the corresponding function, unless that function is None.
+    """Helper function that asks for valid user input, then calls the corresponding function,
+    unless that function is None.
     """
     print("\nSelect an Option:\n")
     index = 1
@@ -58,8 +58,7 @@ def choose(choices: dict[str, Union[Callable, None, tuple[Callable, list],
         else:
             break
 
-    action = [value for value in choices.values(
-    ) if value is not None][int(choice) - 1]
+    action = [value for value in choices.values() if value is not None][int(choice) - 1]
 
     if isinstance(action, list):
         for step in action:
@@ -89,7 +88,10 @@ def cat_select() -> None:
         global graph
         graph = wiki_graph.create_digraph(choice)
     except:
-        print("This category wasn't found on Wikipedia, please ensure that you are entering the title without the cateogry prefix, ex.: \"Logic programming languages\"")
+        print(
+            "This category wasn't found on Wikipedia, please"
+            " ensure that you are entering the title without "
+            "the cateogry prefix, ex.: \"Logic programming languages\"")
         cat_select()
 
     main_menu()
@@ -100,7 +102,8 @@ def cat_visualize() -> None:
     global graph
 
     choose({"Visualize Graph": [(visualize.visualize_digraph, graph), cat_visualize],
-            "Visualize PageRank Graph": [(algorithms.assign_pagerank, graph), (visualize.visualize_pagerank, graph), cat_visualize],
+            "Visualize PageRank Graph": [(algorithms.assign_pagerank, graph),
+                                         (visualize.visualize_pagerank, graph), cat_visualize],
             "Visualize Link Histograms": [(visualize.visualize_histograms, graph)],
             "Main Menu": main_menu})
 
