@@ -124,11 +124,14 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
     else:
         labels = list(graph.nodes())
 
-    # Calculate a modifier to scale the scores by
-    size_modifier = (max_size - min_size) / (max(scores) - min(scores))
+    if graph.number_of_nodes() != 0:
+        # Calculate a modifier to scale the scores by
+        size_modifier = (max_size - min_size) / (max(scores) - min(scores))
 
-    # Create a list of sizes for each node using the size modifier and specified size variables
-    sizes = [min_size + (size * size_modifier) for size in scores]
+        # Create a list of sizes for each node using the size modifier and specified size variables
+        sizes = [min_size + (size * size_modifier) for size in scores]
+    else:
+        sizes = []
 
     # Use the created variables to call the main visualize function
     visualize(x_values, y_values, sizes, labels, graph, pos, arrows)
@@ -194,6 +197,39 @@ def visualize_histograms(graph: nx.DiGraph, local: bool = True) -> None:
     fig.update_yaxes(title_text='Number of Pages')
     fig.update_traces(opacity=0.75)
 
+    fig.show()
+
+
+def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
+    """Visualize the convergence of the manual PageRank algorithm."""
+    # construct dictionary mapping article to a list of PageRank scores, one for each iteration
+    all_page_ranks = algorithms.calculate_pagerank_manual(graph)
+    article_convergences = dict.fromkeys(all_page_ranks[0].keys(), [])
+    for article in article_convergences:
+        article_convergences[article] = [iteration[article]
+                                         for iteration in all_page_ranks]
+
+    # generate line graph using plotly
+    times = list(range(len(all_page_ranks)))
+    fig = Figure()
+    for article in article_convergences:
+        article_scatter = Scatter(x=times,
+                                  y=article_convergences[article],
+                                  mode='lines+markers',
+                                  name=article,
+                                  text=article)
+        fig.add_trace(article_scatter)
+    fig.update_layout(showlegend=True,
+                      title=graph.graph['category'] + ' PageRank convergence',
+                      xaxis_title='Iteration #',
+                      yaxis_title='PageRank Score',
+                      legend_title='Articles')
+    fig.update_xaxes(showgrid=True, zeroline=True, visible=True)
+    if log_yaxis:
+        fig.update_yaxes(showgrid=True, zeroline=True,
+                         visible=True, type="log")
+    else:
+        fig.update_yaxes(showgrid=True, zeroline=True, visible=True)
     fig.show()
 
 

@@ -118,6 +118,8 @@ def cat_visualize(graph: Optional[nx.DiGraph] = None) -> None:
             "Visualize PageRank Graph": [(algorithms.assign_pagerank, graph),
                                          (visualize.visualize_pagerank, graph),
                                          (cat_visualize, graph)],
+            "Visualize PageRank Convergence": [(visualize.visualize_convergence, graph),
+                                               (cat_visualize, graph)],
             "Visualize Link Histograms": [(algorithms.assign_link_stats, graph),
                                           (visualize.visualize_histograms, graph),
                                           (cat_visualize, graph)],
