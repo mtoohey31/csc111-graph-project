@@ -28,7 +28,7 @@ def main_menu(graph: Optional[nx.DiGraph] = None) -> None:
             "Select Category": (cat_select, graph),
             "Category Visualizations (Please select a category first)": None,
             "Category Recommendations (Please select a category first)": None,
-            "Exit": exit}, graph)
+            "Exit": exit})
 
     else:
         choose({
@@ -36,7 +36,7 @@ def main_menu(graph: Optional[nx.DiGraph] = None) -> None:
                                                                                     graph),
             "Category Visualizations": (cat_visualize, graph),
             "Category Recommendations": (cat_recommend, graph),
-            "Exit": exit}, graph)
+            "Exit": exit})
 
 
 def choose(choices: dict[str, Union[None, Callable[[], Any], tuple[Callable[..., Any], Any],
