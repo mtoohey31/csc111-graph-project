@@ -94,7 +94,7 @@ def cat_select(graph: Optional[nx.DiGraph] = None) -> None:
     """Allow the user to select a category."""
     # Prompt the user for input and collect that input
     print("\nPlease select a category.\n")
-    choice = input("Cateogry Name: ")
+    choice = input("Category Name: ")
 
     # Ensure the graph is created without issue before returning to the main menu.
     try:
