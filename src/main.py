@@ -104,7 +104,7 @@ def cat_select(graph: Optional[nx.DiGraph] = None) -> None:
         print(
             "This category wasn't found on Wikipedia, please"
             " ensure that you are entering the title without "
-            "the cateogry prefix, ex.: \"Logic programming languages\"")
+            "the category prefix, ex.: \"Logic programming languages\"")
         cat_select(graph)
 
     # Return to the main menu
