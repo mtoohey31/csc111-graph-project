@@ -96,9 +96,9 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
     """
     # Create a list of partitions using a spring layout
     if graph.number_of_nodes() != 0:
-        pos = getattr(nx, 'spring_layout')(graph, k=(1 / (graph.number_of_nodes() ** (1 / 4))))
+        pos = nx.spring_layout(graph, k=(1 / (graph.number_of_nodes() ** (1 / 4))))
     else:
-        pos = getattr(nx, 'spring_layout')(graph)
+        pos = nx.spring_layout(graph)
 
     # Create a list of x values based on the positions
     x_values = [pos[k][0] for k in graph.nodes]
@@ -146,9 +146,9 @@ def visualize_digraph(graph: nx.DiGraph, node_size: int = 20, arrows: bool = Fal
     """
     # Create a list of positions using a spring layout
     if graph.number_of_nodes() != 0:
-        pos = getattr(nx, 'spring_layout')(graph, k=(1 / (graph.number_of_nodes() ** (1 / 4))))
+        pos = nx.spring_layout(graph, k=(1 / (graph.number_of_nodes() ** (1 / 4))))
     else:
-        pos = getattr(nx, 'spring_layout')(graph)
+        pos = nx.spring_layout(graph)
 
     # Create a list of x values based on the positions
     x_values = [pos[k][0] for k in graph.nodes]
