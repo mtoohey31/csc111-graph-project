@@ -29,7 +29,7 @@ def print_lst(num: int, g: nx.DiGraph, n: int, page: str = None) -> None:
     elif num == 2:
         lst = top_wiki_pagerank_pages(g, n)
         print(('\nTop ' + str(len(lst)) + ' Wikipedia pages in this category, using the'
-                                          ' Pagerank algorithm:'
+                                          ' PageRank algorithm:'
                                           '\nPAGE IMPORTANCE SCORE || PAGE NAME'))
         pprint.pprint(lst)
 
@@ -224,7 +224,7 @@ def visualize_rankings(g: nx.DiGraph, n: int) -> None:
                             subplot_titles=("Comparison Chart of Top Ranked Pages from Both "
                                             "Algorithms", "Top Ranked Wikipedia Pages using the"
                                             " Basic Algorithm (Pages vs Number of Connections)",
-                                            "Top Ranked Wikipedia Pages using Pagerank's Page"
+                                            "Top Ranked Wikipedia Pages using PageRank's Page"
                                             " Importance Algorithm (Pages vs Page Importance"
                                             " Score)"))
 

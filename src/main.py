@@ -137,7 +137,7 @@ def cat_recommend(graph: Optional[nx.DiGraph] = None) -> None:
     choose({"List of Top Ranked Wikipedia Pages (Basic)":
             [(recommendations.print_lst, [1, graph, n]),
              (cat_recommend, graph)],
-            "List of Top Ranked Wikipedia Pages (Pagerank Importance)":
+            "List of Top Ranked Wikipedia Pages (PageRank Importance)":
                 [(recommendations.print_lst, [2, graph, n]),
                  (cat_recommend, graph)],
             "List of Top Page Recommendations for " + page + ", based on Similarity Scores":
