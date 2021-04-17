@@ -10,8 +10,7 @@ Copyright and Usage Information
 The usage of this program should follow the GNU General Public License.
 
 This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, and Azka Azmi.
-""" 
-
+"""
 from typing import Any
 import pprint
 import networkx as nx
@@ -281,7 +280,7 @@ def visualize_recommendation(page: str, n: int, g: nx.DiGraph) -> None:
     chart visual that displays at most n other wikipedia page recommendations in the same category
     the graph is based on. Recommendations are generated from top_wiki_page_recommendations() using
     a similarity score based upon the weightless version from A3.
-    
+
     Preconditions:
     - n > 0
     """
