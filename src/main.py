@@ -68,8 +68,13 @@ def choose(choices: dict[str, Union[None, Callable[[], Any], tuple[Callable[...,
         else:
             break
 
-    action = [value for value in choices.values() if value is not None][int(choice) - 1]
+    run_action([value for value in choices.values() if value is not None][int(choice) - 1])
 
+
+def run_action(action: Union[None, Callable[[], Any], tuple[Callable[..., Any], Any],
+                             list[Union[Callable[[], Any],
+                                        tuple[Callable[..., Any], Any]]]]) -> None:
+    """Run the provided argument, which is an action selected in `choose`."""
     # Parse the different combinations of data structures, calling the appropriate functions with
     # the provided arguments
     if isinstance(action, list):
