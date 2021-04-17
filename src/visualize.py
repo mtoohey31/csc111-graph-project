@@ -198,7 +198,7 @@ def visualize_histograms(graph: nx.DiGraph, local: bool = True) -> None:
     fig.show()
 
 
-def visualize_convergence(graph: nx.Graph, log_yaxis: bool = True) -> None:
+def visualize_convergence(graph: nx.DiGraph, log_yaxis: bool = True) -> None:
     """Visualize the convergence of the manual PageRank algorithm."""
     # construct dictionary mapping article to a list of PageRank scores, one for each iteration
     all_page_ranks = algorithms.calculate_pagerank_manual(graph)
