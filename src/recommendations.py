@@ -2,8 +2,8 @@
 
 Module Description
 ==================
-This module contains Recommendation, Ranking and Similarity Algorithms used to analyze and return the similarities between
-pages within certain Wikipedia Categories
+This module contains Recommendation, Ranking and Similarity Algorithms used to analyze and return
+the similarities between pages within certain Wikipedia Categories
 
 Copyright and Usage Information
 ===============================
