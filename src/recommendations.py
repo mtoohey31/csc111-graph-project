@@ -1,5 +1,17 @@
-""" Recommendation and Similarity Algorithms used to analyze and return the similarities between
-pages within certain Wikipedia Categories"""
+"""CSC111 Winter 2021: Project Phase 2
+
+Module Description
+==================
+This module contains Recommendation, Ranking and Similarity Algorithms used to analyze and return the similarities between
+pages within certain Wikipedia Categories
+
+Copyright and Usage Information
+===============================
+The usage of this program should follow the GNU General Public License.
+
+This file is Copyright (c) 2021 Gabe Guralnick, Matthew Toohey, Nathan Hansen, and Azka Azmi.
+""" 
+
 from typing import Any
 import pprint
 import networkx as nx
