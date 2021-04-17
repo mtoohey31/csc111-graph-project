@@ -120,7 +120,7 @@ def visualize_pagerank(graph: nx.DiGraph, min_size: int = 10, max_size: int = 50
         labels = list(graph.nodes())
 
     if graph.number_of_nodes() != 0:
-        sizes = [node[1]['pagerank'] for node in graph.nodes(data=True)]
+        sizes = [g_node[1]['pagerank'] for g_node in graph.nodes(data=True)]
 
         # Calculate a modifier to scale the scores by
         size_modifier = (max_size - min_size) / (max(sizes) - min(sizes))
