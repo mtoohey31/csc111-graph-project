@@ -8,11 +8,11 @@ To learn about our results, check out the [report folder](./report).
 
 Below is a set of sample results produced by various functions in our program, for the ["Programming Languages" category](https://en.wikipedia.org/wiki/Category:Programming_languages).
 
-![PageRank](<./report/Programming\ languages\ PageRank.png>)
+![PageRank](./report/Programming\ languages\ PageRank.png)
 
-![Convergence](<./report/Programming\ languages\ Convergence.png>)
+![Convergence](./report/Programming\ languages\ Convergence.png)
 
-![Recommendations](<./report/Programming\ languages\ Recommendations.png>)
+![Recommendations](./report/Programming\ languages\ Recommendations.png)
 
 ## Usage
 
